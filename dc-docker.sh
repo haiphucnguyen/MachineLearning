@@ -2,4 +2,4 @@
 
 docker run -p 8888:8888 --name jupyter -v $PWD/notes:/home/jovyan/work jupyter/tensorflow-notebook:abdb27a6dfbb
 
-docker exec -ti jupyter sh -c "conda install -y swig && pip install -r /home/jovyan/work/auto-sklearn-requirements.txt && pip install auto-sklearn"
+docker exec -ti jupyter sh -c "conda install -y swig && pip install -r /home/jovyan/work/auto-sklearn-requirements.txt && pip install tpot"
