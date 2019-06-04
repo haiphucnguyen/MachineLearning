@@ -40,9 +40,7 @@ X_test = scaler.transform(X_test)
 
 from autosklearn.classification import AutoSklearnClassifier
 
-cls = AutoSklearnClassifier(include_estimators=['lda','k_nearest_neighbors','passive_aggressive','gradient_boosting','extra_trees','liblinear_svc'],
-                              resampling_strategy='cv',
-                            resampling_strategy_arguments={'folds': 5}, ml_memory_limit=222000)
+cls = AutoSklearnClassifier()
 cls.fit(X_train, Y_train)
 
 predictions = cls.predict(X_test)
