@@ -1,7 +1,7 @@
 from flask import Flask
 from flask import jsonify
 from domain import Person
-#from services import Recommendation
+from services.recommendation import Recommendation
 
 # the all-important app variable:
 app = Flask(__name__)
@@ -16,8 +16,8 @@ def hello():
 
 @app.route('/recommendations/<userid>')
 def makeRecommendations(userid):
- #   service = Recommendation()
-    return "Make recommendation for user " + userid
+    return Recommendation().execute(userid)
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
