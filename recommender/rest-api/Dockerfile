@@ -10,6 +10,3 @@ RUN conda install -c conda-forge scikit-surprise
 USER root
 
 RUN apt-get -y update && apt-get -y install vim
-
-ENTRYPOINT ["python"]
-CMD ["main.py"]
