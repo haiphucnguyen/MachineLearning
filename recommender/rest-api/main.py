@@ -7,8 +7,8 @@ app = Flask(__name__)
 
 @app.route("/users")
 def hello():
-    data = [Person("Hai", "1"), Person("Quy", "2")]
-    resp = jsonify([e.serialize() for e in data])
+    data = [Person("Hai", "1"), Person("Quy1", "2")]
+    resp = jsonify(users=[e.serialize() for e in data])
     resp.status_code = 200
 
     return resp
