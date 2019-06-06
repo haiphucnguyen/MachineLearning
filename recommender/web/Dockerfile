@@ -1,6 +1,6 @@
 FROM nginx:alpine
 
-COPY ./dist/web /usr/share/nginx/html
+COPY dist/web /usr/share/nginx/html
 
 #Build angular web command (in folder web):ng build
 #Build imgage command: docker build -t recommender-web .

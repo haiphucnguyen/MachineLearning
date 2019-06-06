@@ -5,7 +5,7 @@ LABEL maintainer="Jupyter Project <jupyter@googlegroups.com>"
 COPY . /app
 WORKDIR /app
 RUN pip install -r requirements.txt
-RUN conda install -c conda-forge scikit-surprise
+RUN conda install -c conda-forge scikit-surprise uwsgi
 
 USER root
 
