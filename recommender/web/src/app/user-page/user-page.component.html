@@ -1,0 +1,9 @@
+<p>
+  RECOMMEND MOVIE FOR USER
+</p>
+<div *ngFor="let movie of movies">
+  <a href="javascript:void(0)" (click)="selectMovie(movie.user_id)">
+    <img src="../../assets/user-icon.png">
+    <span>user.display_name</span>
+  </a>
+</div>

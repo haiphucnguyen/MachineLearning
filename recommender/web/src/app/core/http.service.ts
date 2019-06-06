@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
+import {Observable} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -8,12 +9,18 @@ export class HttpService {
 
   constructor(private httpClient: HttpClient) { }
 
-  getUsers(): void {
-    console.log(this.httpClient);
-    console.log("get user list");
-    this.httpClient.get('http://localhost:5000/users').subscribe(d => {
-      console.log(d);
-    });
+  getUsers(): Observable<User[]> {
+    return this.httpClient.get<User[]>('/users');
+  }
+
+  loadUserPage(user_id): Observable<any> {
+    // TODO[QUY]: complete this
+    return this.httpClient.get('/users');
+  }
+
+  loadMovie(movie_id: string): Observable<any> {
+    // TODO[QUY]: complete this
+    return this.httpClient.get('/users');
   }
 
 

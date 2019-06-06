@@ -3,21 +3,22 @@ import {HttpService} from "../core/http.service";
 import {ActivatedRoute, Router} from "@angular/router";
 
 @Component({
-  selector: 'app-select-user',
-  templateUrl: './select-user.component.html',
-  styleUrls: ['./select-user.component.scss']
+  selector: 'app-movie-page',
+  templateUrl: './movie-page.component.html',
+  styleUrls: ['./movie-page.component.scss']
 })
-export class SelectUserComponent implements OnInit {
+export class MoviePageComponent implements OnInit {
 
-  public users: User[];
+  public watchingMovie: Movie;
+  public recommendMovies: Movie[];
 
   constructor(private httpService: HttpService,
               private activatedRoute: ActivatedRoute,
               private router: Router) { }
 
   ngOnInit() {
-    this.users = this.activatedRoute.snapshot.data.res;
-    console.log(this.users);
+    const users = this.activatedRoute.snapshot.data.res;
+    console.log(users);
   }
 
   selectUser(user_id: string) {
@@ -25,6 +26,5 @@ export class SelectUserComponent implements OnInit {
     console.log(user_id);
     this.router.navigate([`/user/${user_id}`]);
   }
-
 
 }
