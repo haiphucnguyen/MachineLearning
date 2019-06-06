@@ -1,0 +1,6 @@
+<div *ngFor="let user of users" class="user-block">
+  <a href="javascript:void(0)" (click)="selectUser(user.user_id)">
+    <img src="../../assets/user-icon.png">
+    <span>user.display_name</span>
+  </a>
+</div>
