@@ -4,6 +4,8 @@ interface User {
 }
 
 interface Movie {
-  movie_id: string,
-  movie_name: string
+  movieid: string,
+  movieimg: string,
+  moviename: string,
+  pre_rating: number
 }

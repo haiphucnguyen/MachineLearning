@@ -15,7 +15,7 @@ export class HttpService {
 
   loadUserPage(user_id): Observable<any> {
     // TODO[QUY]: complete this
-    return this.httpClient.get('/users');
+    return this.httpClient.get(`/recommendations/${user_id}`);
   }
 
   loadMovie(movie_id: string): Observable<any> {
