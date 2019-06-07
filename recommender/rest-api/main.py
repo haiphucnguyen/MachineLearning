@@ -1,6 +1,7 @@
 from flask import Flask
 from services.users import UserService
 from services.recommendation import RecommendationService
+from globals import Globals
 
 # the all-important app variable:
 app = Flask(__name__)
