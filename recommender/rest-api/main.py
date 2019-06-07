@@ -1,22 +1,17 @@
 from flask import Flask
-from flask import jsonify
-from domain import Person
-from services.recommendation import Recommendation
+from services.users import UserService
+from services.recommendation import RecommendationService
 
 # the all-important app variable:
 app = Flask(__name__)
 
 @app.route("/users")
-def hello():
-    data = [Person("Hai", "1"), Person("Quy1", "2")]
-    resp = jsonify([e.serialize() for e in data])
-    resp.status_code = 200
-
-    return resp
+def listUsers():
+    return UserService().execute()
 
 @app.route('/recommendations/<userid>')
 def makeRecommendations(userid):
-    return Recommendation().execute(userid)
+    return RecommendationService().execute(userid)
 
 
 if __name__ == '__main__':
