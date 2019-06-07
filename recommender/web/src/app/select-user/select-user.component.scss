@@ -1,7 +1,24 @@
+.container {
+  width: 80%;
+  margin: 0px auto;
+}
 .user-block {
   float: left;
-  border: 1px solid gray;
   margin-right: 10px;
-  width: 255px;
+  margin-top: 10px;
+  width: 100px;
+  padding:3px;
   text-align: center;
+  border: 1px solid #F2D1C9;
+  border-radius: 7px;
+}
+
+.user-block a {
+  text-decoration: none;
+  color:#BF5E5E;
+}
+
+.user-block a img {
+  width: 100px;
+  background-color: transparent;
 }
