@@ -14,6 +14,7 @@ class Globals:
         # do something to prove it works
         movies_df = spark.read.option("header", "true").csv("data/movies.csv", inferSchema=True)
         links_df = spark.read.option("header", "true").csv("data/links.csv", inferSchema=True)
+        movies_df = movies_df.join(links_df, on=['movieid'])
         ratings_df = spark.read.option("header", "true").csv("data/ratings.csv", inferSchema=True)
         tags_df = spark.read.option("header", "true").csv("data/tags.csv", inferSchema=True)
 
@@ -31,6 +32,6 @@ class Globals:
                                         predictionCol="prediction")
         rmse = evaluator.evaluate(predictions)
 
-        return "Hello World"
+        return {"movies_df": movies_df, "ratings_df": ratings_df, "tags_df": tags_df}
 
 Globals.recommendObjs = Globals.recommendator()
