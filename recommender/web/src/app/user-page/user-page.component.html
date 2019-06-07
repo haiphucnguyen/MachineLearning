@@ -2,7 +2,7 @@
   <p>
     RECOMMEND MOVIE FOR USER
   </p>
-  <div *ngFor="let movie of movies" class="movie-block">
+  <div *ngFor="let movie of movies" class="movie-block" data-toggle="tooltip" title="Predict: {{movie.pre_rating}}">
     <a href="javascript:void(0)" (click)="selectMovie(movie.movieid)">
       <img src="{{movie.movieimg}}">
       <span>{{movie.moviename}}</span>
