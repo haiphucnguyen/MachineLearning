@@ -10,6 +10,7 @@ import {MoviePageResolverService} from "./core/resolvers/movie-page-resolver.ser
 const routes: Routes = [
   {
     path: '',
+    pathMatch: 'full',
     component: SelectUserComponent,
     resolve: {
       res: UsersResolverService
@@ -34,6 +35,6 @@ const routes: Routes = [
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule],
-  providers: [UsersResolverService]
+  providers: [UsersResolverService, UserPageResolverService, MoviePageResolverService]
 })
 export class AppRoutingModule {}
