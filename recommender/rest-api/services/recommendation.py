@@ -3,9 +3,6 @@ from flask import jsonify
 from globals import Globals
 
 from pyspark.sql import SparkSession
-from pyspark.sql.types import DoubleType
-from pyspark.ml.evaluation import RegressionEvaluator
-from pyspark.ml.recommendation import ALS
 from pyspark.sql import SQLContext
 
 spark = SparkSession.builder.appName("Recommendation ALS").getOrCreate()
