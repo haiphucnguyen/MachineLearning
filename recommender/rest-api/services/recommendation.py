@@ -37,7 +37,7 @@ class RecommendationService:
         predictions.registerTempTable("predictions")
 
         unwatched_movies_rating = sqlContext.sql(
-            "SELECT * FROM unwatchedMovies INNER JOIN predictions WHERE unwatchedMovies.movieId = predictions.movieId order by predictions.rating, predictions.prediction DESC")
+            "SELECT * FROM unwatchedMovies INNER JOIN predictions WHERE unwatchedMovies.movieId = predictions.movieId order by predictions.prediction, predictions.rating DESC")
 
         ##### Extract recommended movies
 
