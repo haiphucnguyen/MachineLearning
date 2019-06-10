@@ -11,30 +11,33 @@ class RecommendationService:
 
     def execute(self, userid):
 
-        movies_df = Globals.recommendObjs["movies_df"]
-        ratings_df = Globals.recommendObjs["ratings_df"]
-        predictions = Globals.recommendObjs["predictions"]
+        movies_df = Globals.movies_df
+        ratings_df = Globals.ratings_df
+        predictions = Globals.predictions
 
         ###### Training and evaluation
 
         ######## Get latest movies
         watched_movies = ratings_df.filter(ratings_df['userId'] == userid).select("movieId")
 
-        print("Watch movies {}".format(watched_movies.count()))
+        print("Watched movies {}".format(watched_movies.count()))
         print("Total movies {}".format(movies_df.count()))
 
         sqlContext = SQLContext(spark.sparkContext)
-        watched_movies.registerTempTable('watchedMovies')
-        movies_df.registerTempTable("movies")
+        # watched_movies.registerTempTable('watchedMovies')
+        # movies_df.registerTempTable("movies")
 
-        unwatched_movies = sqlContext.sql(
-            "SELECT * FROM movies WHERE movies.movieId NOT IN (SELECT movieId FROM watchedMovies)")
+        # unwatched_movies = sqlContext.sql(
+        #     "SELECT * FROM movies WHERE movies.movieId NOT IN (SELECT movieId FROM watchedMovies)")
+        unwatched_movies = movies_df.filter(~movies_df['movieId'].isin(watched_movies.select("movieId").rdd.map(lambda r:r[0]).collect()))
+        # unwatched_movies.registerTempTable('unwatchedMovies')
+        # predictions.registerTempTable("predictions")
 
-        unwatched_movies.registerTempTable('unwatchedMovies')
-        predictions.registerTempTable("predictions")
+        # unwatched_movies_rating = sqlContext.sql(
+        #     "SELECT * FROM unwatchedMovies INNER JOIN predictions ON unwatchedMovies.movieId = predictions.movieId order by predictions.prediction DESC, predictions.rating DESC")
 
-        unwatched_movies_rating = sqlContext.sql(
-            "SELECT * FROM unwatchedMovies INNER JOIN predictions ON unwatchedMovies.movieId = predictions.movieId order by predictions.prediction DESC, predictions.rating DESC")
+        unwatched_movies_rating = unwatched_movies.join(predictions, on=['movieId'])
+        unwatched_movies_rating.sort('prediction', ascending=False)
 
         ##### Extract recommended movies
 

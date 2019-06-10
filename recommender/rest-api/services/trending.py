@@ -9,7 +9,7 @@ class TrendingService:
         print("Hello")
 
     def getGlobalTrending(self):
-        group_movies = Globals.recommendObjs["ratings_df"].groupBy("movieId").agg(
+        group_movies = Globals.ratings_df.groupBy("movieId").agg(
             mean("rating").alias("average_rating"), \
             count("rating").alias("count_rating"))
         C = group_movies.agg(mean("average_rating")).collect()[0][0]
@@ -19,8 +19,7 @@ class TrendingService:
                                                / (col("count_rating") + 10) + 10 * C / (col("count_rating") + 10))
         group_movies = group_movies.select("movieId", "weighted_average").orderBy("weighted_average",
                                                                                   ascending=False).limit(10)
-        trend_movies = group_movies.join(Globals.recommendObjs["movies_df"], on="movieId").select("movieId", "title",
-                                                                                                  "weighted_average")
+        trend_movies = group_movies.join(Globals.movies_df, on="movieId").select("movieId", "title",  "weighted_average")
         trend_movies_list = [list(row) for row in trend_movies.collect()]
         data = []
         for movie in trend_movies_list:
@@ -30,12 +29,12 @@ class TrendingService:
 
     def getGenreTrending(self, genre):
         udf_parse_genres = udf(lambda str: str.split("|"), ArrayType(StringType()))
-        new_movies_df = Globals.recommendObjs["movies_df"].select("movieId", "title", udf_parse_genres("genres").alias("genre"))
+        new_movies_df = Globals.movies_df.select("movieId", "title", udf_parse_genres("genres").alias("genre"))
         new_movies_df = new_movies_df.withColumn("genre", explode("genre"))
 
         genre_movies_df = new_movies_df.filter(new_movies_df["genre"] == genre).select("movieId", "title")
 
-        genre_ratings_df = Globals.recommendObjs["ratings_df"].join(genre_movies_df, on="movieId", how="inner")
+        genre_ratings_df = Globals.ratings_df.join(genre_movies_df, on="movieId", how="inner")
 
         genre_group_movies = genre_ratings_df.groupBy("movieId").agg(mean("rating").alias("average_rating"), \
                                                                      count("rating").alias("count_rating"))

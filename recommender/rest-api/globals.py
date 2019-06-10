@@ -32,10 +32,12 @@ class Globals:
                                         predictionCol="prediction")
         rmse = evaluator.evaluate(predictions)
 
-        genres = ["Crime", "Romance", "Thriller", "Adventure", "Drama", "War", "Documentary", "Fantasy", "Mystery", \
+        Globals.movies_df = movies_df
+        Globals.ratings_df = ratings_df
+        Globals.tags_df = tags_df
+        Globals.predictions = predictions
+        Globals.genres = ["Crime", "Romance", "Thriller", "Adventure", "Drama", "War", "Documentary", "Fantasy", "Mystery", \
                   "Musical", "Animation", "Film-Noir", "(no genres listed)", "IMAX", "Horror", "Western", \
                   "Comedy", "Children", "Action", "Sci-Fi"]
 
-        return {"movies_df": movies_df, "ratings_df": ratings_df, "tags_df": tags_df, "predictions": predictions, "genres": genres}
-
-Globals.recommendObjs = Globals.recommendator()
+Globals.recommendator()
