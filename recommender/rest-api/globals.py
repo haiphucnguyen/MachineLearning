@@ -32,6 +32,11 @@ class Globals:
                                         predictionCol="prediction")
         rmse = evaluator.evaluate(predictions)
 
-        return {"movies_df": movies_df, "ratings_df": ratings_df, "tags_df": tags_df, "predictions": predictions}
+        Globals.movies_df = movies_df
+        Globals.ratings_df = ratings_df
+        Globals.tags_df = tags_df
+        Globals.predictions = predictions
 
-Globals.recommendObjs = Globals.recommendator()
+        # return {"movies_df": movies_df, "ratings_df": ratings_df, "tags_df": tags_df, "predictions": predictions}
+
+Globals.recommendator()
