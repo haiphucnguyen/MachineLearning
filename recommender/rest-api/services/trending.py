@@ -1,6 +1,9 @@
-class Trending:
+class TrendingService:
     def __init__(self):
         print("Hello")
 
-    def execute(self, userid):
-        return "Make Trendinging for userxx " + userid
+    def getGlobalTrending(self):
+        return "Make Trendinging for userxx "
+
+    def getGenreTrending(self, genre):
+        return "Genre trending " + genre

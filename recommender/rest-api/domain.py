@@ -10,10 +10,26 @@ class Person:
         }
 
 
-class MovieEntry:
-    def __init__(self, movieid, moviename, movieimg, pre_rating):
+class BaseMovieEntry:
+    def __init__(self, movieid, moviename):
         self.movieid = movieid
         self.moviename = moviename
+
+class TrendingMovieEntry(BaseMovieEntry):
+    def __init__(self, movieid, moviename, weight):
+        BaseMovieEntry.__init__(self, movieid, moviename)
+        self.weight = weight
+
+    def serialize(self):
+        return {
+            'movieid': self.movieid,
+            'moviename': self.moviename,
+            'weight': self.weight
+        }
+
+class MovieEntry(BaseMovieEntry):
+    def __init__(self, movieid, moviename, movieimg, pre_rating):
+        BaseMovieEntry.__init__(self, movieid, moviename)
         self.movieimg = movieimg
         self.pre_rating = pre_rating
 
