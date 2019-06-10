@@ -41,7 +41,7 @@ class RecommendationService:
 
         ##### Extract recommended movies
 
-        recommendedMovies = unwatched_movies_rating.take(20)
+        recommendedMovies = unwatched_movies_rating.take(10)
         data = []
         for r in recommendedMovies:
             data.append(MovieEntry(r['movieId'], r['title'], "UrL %s" % r['title'], r['prediction']))

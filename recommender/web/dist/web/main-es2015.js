@@ -329,7 +329,7 @@ let UserPageResolverService = class UserPageResolverService {
     resolve(route, state) {
         const user_id = route.paramMap.get('user_id');
         console.log("In USers page resolver", user_id);
-        return this.httpService.loadUserPage(user_id);
+        return this.httpService.loadRecommendMoviesForUser(user_id);
     }
 };
 UserPageResolverService = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([

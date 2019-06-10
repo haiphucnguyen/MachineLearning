@@ -1,10 +1,33 @@
 <div class="container">
   <p>
-    RECOMMEND MOVIE FOR USER
+    TRENDING MOVIES
   </p>
-  <a href="javascript:void(0)" (click)="selectMovie(movie.movieid)"
+  <a href="javascript:void(0)" *ngFor="let movie of trendingMovies" class="movie-block" (click)="selectMovie(movie.movieid)"
+     data-toggle="tooltip" title="Weight: {{movie.weight}}"
+      >
+    <img src="../../assets/movie-icon.png" alt="{{movie.movieimg}}">
+    <span>{{movie.moviename}}</span>
+  </a>
+
+  <div *ngFor="let hobbie of userHobbies">
+    <p>
+      {{hobbie.key}}
+    </p>
+    <a href="javascript:void(0)" *ngFor="let movie of hobbie.value" (click)="selectMovie(movie.movieid)"
+     data-toggle="tooltip" title="Weight: {{movie.pre_rating}}"
+       class="movie-block">
+    <img src="../../assets/movie-icon.png" alt="{{movie.movieimg}}">
+    <span>{{movie.moviename}}</span>
+  </a>
+
+  </div>
+
+  <p>
+    RECOMMEND MOVIES FOR USER
+  </p>
+  <a href="javascript:void(0)" *ngFor="let movie of recommendMovies" (click)="selectMovie(movie.movieid)"
      data-toggle="tooltip" title="Predict: {{movie.pre_rating}}"
-      *ngFor="let movie of movies" class="movie-block">
+       class="movie-block">
     <img src="../../assets/movie-icon.png" alt="{{movie.movieimg}}">
     <span>{{movie.moviename}}</span>
   </a>

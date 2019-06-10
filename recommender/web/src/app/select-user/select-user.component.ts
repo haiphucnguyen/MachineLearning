@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {HttpService} from "../core/http.service";
-import {ActivatedRoute, Router} from "@angular/router";
+import {ActivatedRoute, NavigationExtras, Router} from "@angular/router";
 
 @Component({
   selector: 'app-select-user',
@@ -20,10 +20,14 @@ export class SelectUserComponent implements OnInit {
     console.log(this.users);
   }
 
-  selectUser(user_id: string) {
-
-    console.log(user_id);
-    this.router.navigate([`/user/${user_id}`]);
+  selectUser(user: User) {
+    // let navigationExtras: NavigationExtras = {
+    //   queryParams: {
+    //     'user': JSON.stringify(user)
+    //   }
+    // };
+    localStorage.setItem('user', JSON.stringify(user));
+    this.router.navigate([`/user/${user.user_id}`]);
   }
 
 

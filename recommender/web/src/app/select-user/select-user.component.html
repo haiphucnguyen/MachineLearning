@@ -1,6 +1,6 @@
 
 <div class="container">
-  <a *ngFor="let user of users" class="user-block" href="javascript:void(0)" (click)="selectUser(user.user_id)">
+  <a *ngFor="let user of users" class="user-block" href="javascript:void(0)" (click)="selectUser(user)">
       <img src="../../assets/user-icon.png">
       <span>{{user.display_name}}</span>
   </a>

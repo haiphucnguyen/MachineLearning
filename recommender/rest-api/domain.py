@@ -1,12 +1,14 @@
 class Person:
-    def __init__(self, displayname, userid):
+    def __init__(self, displayname, userid, hobbies):
         self.displayname = displayname
         self.userid = userid
+        self.hobbies = hobbies
 
     def serialize(self):
         return {
             'display_name': self.displayname,
             'user_id': self.userid,
+            'hobbies': self.hobbies
         }
 
 

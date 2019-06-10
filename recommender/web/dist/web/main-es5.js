@@ -338,7 +338,7 @@ var UserPageResolverService = /** @class */ (function () {
     UserPageResolverService.prototype.resolve = function (route, state) {
         var user_id = route.paramMap.get('user_id');
         console.log("In USers page resolver", user_id);
-        return this.httpService.loadUserPage(user_id);
+        return this.httpService.loadRecommendMoviesForUser(user_id);
     };
     UserPageResolverService = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])({

@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, ElementRef, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
+import {HttpService} from "../core/http.service";
 
 @Component({
   selector: 'app-user-page',
@@ -9,13 +10,36 @@ import {ActivatedRoute, Router} from "@angular/router";
 export class UserPageComponent implements OnInit {
 
   // TODO[QUY] change here
-  public movies: Movie[];
+  public recommendMovies: Movie[];
+  public trendingMovies: TrendingMovie[];
+  public user: User;
+  public userHobbies: any[] = [];
 
   constructor(private activatedRoute: ActivatedRoute,
-              private router: Router) { }
+              private router: Router,
+              private httpService: HttpService) { }
 
   ngOnInit() {
-      this.movies = this.activatedRoute.snapshot.data.res;
+      this.trendingMovies = this.activatedRoute.snapshot.data.res;
+      this.user = JSON.parse(localStorage.getItem('user'));
+      this.user.hobbies.forEach(v => {
+        this.httpService.loadFavoriteTrendingMovies(v).subscribe(data => {
+          console.log(data);
+            let hobbie = {
+              'key': v,
+              'value': data
+            }
+            console.log(hobbie);
+            this.userHobbies.push(hobbie);
+            console.log(this.userHobbies);
+        });
+      });
+
+      // load recommend movies
+      const user_id = this.activatedRoute.snapshot.paramMap.get('user_id');
+      this.httpService.loadRecommendMoviesForUser(user_id).subscribe(data => {
+        this.recommendMovies = data;
+      });
   }
 
   selectMovie(movie_id: string) {

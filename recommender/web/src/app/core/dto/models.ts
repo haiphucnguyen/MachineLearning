@@ -1,6 +1,7 @@
 interface User {
   user_id: string,
-  display_name: string
+  display_name: string,
+  hobbies: string[]
 }
 
 interface Movie {
@@ -8,4 +9,8 @@ interface Movie {
   movieimg: string,
   moviename: string,
   pre_rating: number
+}
+
+interface TrendingMovie extends Movie{
+  weight: number
 }

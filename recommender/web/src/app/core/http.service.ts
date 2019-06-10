@@ -13,13 +13,19 @@ export class HttpService {
     return this.httpClient.get<User[]>('/users');
   }
 
-  loadUserPage(user_id): Observable<any> {
-    // TODO[QUY]: complete this
+  loadRecommendMoviesForUser(user_id): Observable<any> {
     return this.httpClient.get(`/recommendations/${user_id}`);
   }
 
+  loadTrendingMovie(): Observable<TrendingMovie[]> {
+    return this.httpClient.get<TrendingMovie[]>(`/trendings`);
+  }
+
+  loadFavoriteTrendingMovies(genre: string): Observable<Movie[]> {
+    return this.httpClient.get<Movie[]>(`/trendings/${genre}`);
+  }
+
   loadMovie(movie_id: string): Observable<any> {
-    // TODO[QUY]: complete this
     return this.httpClient.get('/users');
   }
 
