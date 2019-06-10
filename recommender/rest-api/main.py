@@ -26,7 +26,7 @@ def makeRecommendations(userid):
     return RecommendationService().execute(userid)
 
 @app.route('/recommendations/userid=<userid>&&movieid=<movieid>')
-def makeRecommendations(userid, movieid):
+def makeRecommendationsByContent(userid, movieid):
     return ContentBaseService().execute(userid, movieid)
 
 
