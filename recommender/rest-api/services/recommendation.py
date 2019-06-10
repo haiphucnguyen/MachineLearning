@@ -36,8 +36,8 @@ class RecommendationService:
         # unwatched_movies_rating = sqlContext.sql(
         #     "SELECT * FROM unwatchedMovies INNER JOIN predictions ON unwatchedMovies.movieId = predictions.movieId order by predictions.prediction DESC, predictions.rating DESC")
 
-        unwatched_movies_rating = unwatched_movies.join(predictions, on=['movieId'])
-        unwatched_movies_rating.sort('prediction', ascending=False)
+        unwatched_movies_rating = unwatched_movies.join(predictions, on=['movieId'], how = "inner")
+        unwatched_movies_rating = unwatched_movies_rating.sort('prediction', ascending=False)
 
         ##### Extract recommended movies
 
