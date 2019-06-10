@@ -30,11 +30,14 @@ class RecommendationService:
         # unwatched_movies = sqlContext.sql(
         #     "SELECT * FROM movies WHERE movies.movieId NOT IN (SELECT movieId FROM watchedMovies)")
         unwatched_movies = movies_df.filter(~movies_df['movieId'].isin(watched_movies.select("movieId").rdd.map(lambda r:r[0]).collect()))
-        unwatched_movies.registerTempTable('unwatchedMovies')
-        predictions.registerTempTable("predictions")
+        # unwatched_movies.registerTempTable('unwatchedMovies')
+        # predictions.registerTempTable("predictions")
 
-        unwatched_movies_rating = sqlContext.sql(
-            "SELECT * FROM unwatchedMovies INNER JOIN predictions ON unwatchedMovies.movieId = predictions.movieId order by predictions.prediction DESC, predictions.rating DESC")
+        # unwatched_movies_rating = sqlContext.sql(
+        #     "SELECT * FROM unwatchedMovies INNER JOIN predictions ON unwatchedMovies.movieId = predictions.movieId order by predictions.prediction DESC, predictions.rating DESC")
+
+        unwatched_movies_rating = unwatched_movies.join(predictions, on=['movieId'])
+        unwatched_movies_rating.sort('prediction', ascending=False)
 
         ##### Extract recommended movies
 
