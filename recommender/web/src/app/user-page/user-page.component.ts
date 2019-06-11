@@ -24,14 +24,11 @@ export class UserPageComponent implements OnInit {
       this.user = JSON.parse(localStorage.getItem('user'));
       this.user.hobbies.forEach(v => {
         this.httpService.loadFavoriteTrendingMovies(v).subscribe(data => {
-          console.log(data);
             let hobbie = {
               'key': v,
               'value': data
             }
-            console.log(hobbie);
             this.userHobbies.push(hobbie);
-            console.log(this.userHobbies);
         });
       });
 

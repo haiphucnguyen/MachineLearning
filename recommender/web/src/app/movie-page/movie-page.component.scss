@@ -7,3 +7,29 @@
   width: 100%;
   border: 1px solid #BF5E5E;
 }
+
+a.movie-block {
+  display: block;
+  padding: 5px;
+  border: 1px solid #F2D1C9;
+  border-radius: 7px;
+  margin-top: 10px;
+  overflow: hidden;
+  text-decoration: none;
+  color: #BF5E5E;
+  animation-duration: 3s;
+}
+
+a.movie-block:hover {
+  background-color: #e50914;
+  color: white;
+}
+
+.movie-block img {
+  width: 30px;
+  float: left;
+}
+
+.movie-block span {
+  margin-left: 7px;
+}

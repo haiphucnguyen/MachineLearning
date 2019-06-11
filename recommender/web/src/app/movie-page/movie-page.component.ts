@@ -9,22 +9,19 @@ import {ActivatedRoute, Router} from "@angular/router";
 })
 export class MoviePageComponent implements OnInit {
 
-  public watchingMovie: Movie;
-  public recommendMovies: Movie[];
+  public recommendMovies: Movie[] = [];
 
   constructor(private httpService: HttpService,
               private activatedRoute: ActivatedRoute,
               private router: Router) { }
 
   ngOnInit() {
-    const users = this.activatedRoute.snapshot.data.res;
-    console.log(users);
+    this.recommendMovies = this.activatedRoute.snapshot.data.res;
+    console.log(this.recommendMovies);
   }
 
-  selectUser(user_id: string) {
-
-    console.log(user_id);
-    this.router.navigate([`/user/${user_id}`]);
+  selectMovie(movie_id: string) {
+    this.router.navigate([`/movie/${movie_id}`]);
   }
 
 }

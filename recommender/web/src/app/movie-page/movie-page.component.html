@@ -4,10 +4,18 @@
   </p>
 
   <div class="watching">
-    <img src="https://m.media-amazon.com/images/M/MV5BMjQxM2YyNjMtZjUxYy00OGYyLTg0MmQtNGE2YzNjYmUyZTY1XkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_.jpg">
+    <img src="../../assets/movie.jpeg">
   </div>
   <div class="recommender">
-    Recommender
+    <p>
+      RELATED MOVIES
+    </p>
+    <a href="javascript:void(0)" *ngFor="let movie of recommendMovies" (click)="selectMovie(movie.movieid)"
+       data-toggle="tooltip" title="Predict: {{movie.pre_rating}}"
+         class="movie-block">
+      <img src="../../assets/movie-icon.png" alt="{{movie.movieimg}}">
+      <span>{{movie.moviename}}</span>
+    </a>
   </div>
 </div>
 
