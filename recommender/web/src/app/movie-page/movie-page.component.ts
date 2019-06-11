@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {HttpService} from "../core/http.service";
-import {ActivatedRoute, Router} from "@angular/router";
+import {ActivatedRoute, NavigationExtras, Router} from "@angular/router";
 
 @Component({
   selector: 'app-movie-page',
@@ -10,6 +10,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 export class MoviePageComponent implements OnInit {
 
   public recommendMovies: Movie[] = [];
+  public title = '';
 
   constructor(private httpService: HttpService,
               private activatedRoute: ActivatedRoute,
@@ -18,10 +19,17 @@ export class MoviePageComponent implements OnInit {
   ngOnInit() {
     this.recommendMovies = this.activatedRoute.snapshot.data.res;
     console.log(this.recommendMovies);
+    this.title = this.activatedRoute.snapshot.paramMap.get('title');
+    console.log(this.title);
   }
 
-  selectMovie(movie_id: string) {
-    this.router.navigate([`/movie/${movie_id}`]);
+  selectMovie(movie: Movie) {
+    let navigationExtras: NavigationExtras = {
+      queryParams: {
+        'title': movie.moviename
+      }
+    };
+    this.router.navigate([`/movie/${movie.movieid}`, {title: movie.moviename}]);
   }
 
 }
