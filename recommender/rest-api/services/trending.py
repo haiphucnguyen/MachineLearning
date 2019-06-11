@@ -5,8 +5,6 @@ from flask import jsonify
 from domain import TrendingMovieEntry
 
 class TrendingService:
-    def __init__(self):
-        print("Hello")
 
     def getGlobalTrending(self):
         group_movies = Globals.ratings_df.groupBy("movieId").agg(

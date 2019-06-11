@@ -46,9 +46,4 @@ class RecommendationService:
         for r in recommendedMovies:
             data.append(MovieEntry(r['movieId'], r['title'], "UrL %s" % r['title'], r['prediction']))
 
-
-        # END TEST code
-
-        # data = [MovieEntry("1", "God Father", "https://m.media-amazon.com/images/M/MV5BMjQxM2YyNjMtZjUxYy00OGYyLTg0MmQtNGE2YzNjYmUyZTY1XkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_.jpg", 4),
-        #         MovieEntry("2", "God Father 2", "https://m.media-amazon.com/images/M/MV5BMjQxM2YyNjMtZjUxYy00OGYyLTg0MmQtNGE2YzNjYmUyZTY1XkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_.jpg", 5)]
         return jsonify([e.serialize() for e in data])
