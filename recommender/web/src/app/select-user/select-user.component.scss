@@ -20,6 +20,11 @@ a.user-block:hover {
   color: white;
 }
 
+a.user-block:hover img{
+  background-color: white;
+  border-radius: 7px 7px 3px 3px;
+}
+
 .user-block img {
   width: 100px;
   background-color: transparent;
