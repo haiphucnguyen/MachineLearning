@@ -36,6 +36,7 @@ class Globals:
         Globals.ratings_df = ratings_df
         Globals.tags_df = tags_df
         Globals.predictions = predictions
+        Globals.model = model
         Globals.genres = ["Crime", "Romance", "Thriller", "Adventure", "Drama", "War", "Documentary", "Fantasy", "Mystery", \
                   "Musical", "Animation", "Film-Noir", "(no genres listed)", "IMAX", "Horror", "Western", \
                   "Comedy", "Children", "Action", "Sci-Fi"]
