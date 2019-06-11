@@ -1,5 +1,5 @@
 import {Component, ElementRef, OnInit} from '@angular/core';
-import {ActivatedRoute, Router} from "@angular/router";
+import {ActivatedRoute, NavigationExtras, Router} from "@angular/router";
 import {HttpService} from "../core/http.service";
 
 @Component({
@@ -39,8 +39,13 @@ export class UserPageComponent implements OnInit {
       });
   }
 
-  selectMovie(movie_id: string) {
-    this.router.navigate([`movie/${movie_id}`]);
+  selectMovie(movie: Movie) {
+    let navigationExtras: NavigationExtras = {
+      queryParams: {
+        'title': movie.moviename
+      }
+    };
+    this.router.navigate([`movie/${movie.movieid}`, {title: movie.moviename}]);
   }
 
 }

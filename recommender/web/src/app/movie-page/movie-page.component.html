@@ -1,16 +1,15 @@
 <div class="container">
-  <p>
-    Let Watching movie
+  <p class="watching">
+    Let watching movie {{title}}
   </p>
-
   <div class="watching">
-    <img src="../../assets/movie.jpeg">
+    <img src="../../assets/movie.jpg">
   </div>
   <div class="recommender">
     <p>
       RELATED MOVIES
     </p>
-    <a href="javascript:void(0)" *ngFor="let movie of recommendMovies" (click)="selectMovie(movie.movieid)"
+    <a href="javascript:void(0)" *ngFor="let movie of recommendMovies" (click)="selectMovie(movie)"
        data-toggle="tooltip" title="Predict: {{movie.pre_rating}}"
          class="movie-block">
       <img src="../../assets/movie-icon.png" alt="{{movie.movieimg}}">

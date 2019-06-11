@@ -2,7 +2,7 @@
   <p>
     TRENDING MOVIES
   </p>
-  <a href="javascript:void(0)" *ngFor="let movie of trendingMovies" class="movie-block" (click)="selectMovie(movie.movieid)"
+  <a href="javascript:void(0)" *ngFor="let movie of trendingMovies" class="movie-block" (click)="selectMovie(movie)"
      data-toggle="tooltip" title="Weight: {{movie.weight}}"
       >
     <img src="../../assets/movie-icon.png" alt="{{movie.movieimg}}">
@@ -13,7 +13,7 @@
     <p>
       {{hobbie.key}}
     </p>
-    <a href="javascript:void(0)" *ngFor="let movie of hobbie.value" (click)="selectMovie(movie.movieid)"
+    <a href="javascript:void(0)" *ngFor="let movie of hobbie.value" (click)="selectMovie(movie)"
      data-toggle="tooltip" title="Weight: {{movie.pre_rating}}"
        class="movie-block">
     <img src="../../assets/movie-icon.png" alt="{{movie.movieimg}}">
@@ -25,7 +25,7 @@
   <p>
     RECOMMEND MOVIES FOR USER
   </p>
-  <a href="javascript:void(0)" *ngFor="let movie of recommendMovies" (click)="selectMovie(movie.movieid)"
+  <a href="javascript:void(0)" *ngFor="let movie of recommendMovies" (click)="selectMovie(movie)"
      data-toggle="tooltip" title="Predict: {{movie.pre_rating}}"
        class="movie-block">
     <img src="../../assets/movie-icon.png" alt="{{movie.movieimg}}">

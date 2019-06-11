@@ -4,8 +4,12 @@
 }
 
 .watching {
-  width: 100%;
-  border: 1px solid #BF5E5E;
+  text-align: center;
+}
+
+.watching img {
+  border: 1px solid #F2D1C9;
+  height:300px;
 }
 
 a.movie-block {
