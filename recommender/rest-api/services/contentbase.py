@@ -1,6 +1,6 @@
 from pyspark.sql import SparkSession
-from pyspark.sql.types import ArrayType as Arr, IntegerType, StringType, DoubleType
-from pyspark.sql.functions import col, count, mean, udf, UserDefinedFunction, regexp_replace, concat, collect_set, when, abs
+from pyspark.sql.types import ArrayType as Arr, IntegerType, StringType, DoubleType, FloatType
+from pyspark.sql.functions import col, count, mean, udf, UserDefinedFunction, regexp_replace, concat, collect_set, when, abs, lit
 from pyspark.ml.feature import Tokenizer, StopWordsRemover
 from functools import reduce
 from scipy.spatial.distance import cosine
@@ -73,12 +73,55 @@ class ContentBaseService:
                     flattenUdf("collect_set(tags_clean)").alias("tags_clean"))
 
         movies_df = movies_df.join(df_words_no_stopw, on="movieId", how="left").cache()
-        movies_df.show()
+
+        tagsPandaDf = df_words_no_stopw.toPandas()
+        tagsDict = {}
+        for index, x in tagsPandaDf.iterrows():
+            wordlist = x['tags_clean']
+            movieId = x['movieId']
+            for y in wordlist:
+                if movieId in tagsDict:
+                    # if y not in tagsDict[movieId]:  # Switched off (we will get a non unique list)
+                    tagsDict[movieId].append(y)
+                else:
+                    tagsDict[movieId] = [y]
 
         genresSimilarityWeight = 0.8
         tagsSimilarityWeight = 2
         yearDistanceWeight = 0.1
         ratingAvgWeight = 0.2
+
+        def tagsSimilarityFunc(basisMovieID, checkedMovieID):
+            dictToCheck = tagsDict
+            counter = 0
+            if basisMovieID in dictToCheck:
+                basisTags = dictToCheck[basisMovieID]
+                countAllTags = len(basisTags)
+                basisTagsDict = {}
+                for x in basisTags:
+                    if x in basisTagsDict:
+                        basisTagsDict[x] += 1
+                    else:
+                        basisTagsDict[x] = 1
+
+                for x in basisTagsDict:
+                    basisTagsDict[x] = basisTagsDict[x] / countAllTags
+            else:
+                return 0
+
+            if checkedMovieID in dictToCheck:
+                checkedTags = dictToCheck[checkedMovieID]
+                checkedTags = set(checkedTags)  # Make the list unique
+                checkedTags = list(checkedTags)
+
+            else:
+                return 0
+
+            for x in basisTagsDict:
+                if x in checkedTags: counter += basisTagsDict[x]
+            return counter
+
+        tagsSimilarityUdf = udf(tagsSimilarityFunc, FloatType())
 
 
         basisGenres = movies_df.filter(movies_df['movieId'] == movieId).select("genresMatrix").collect()[0][0]
@@ -92,7 +135,8 @@ class ContentBaseService:
 
         moviesWithSim = movies_df.withColumn("similarity", consineUdf("genresMatrix") * genresSimilarityWeight + \
                                              abs(basisRatingAvg - col("mean_rating")) * ratingAvgWeight + \
-                                             abs(basisYear - col("year")) / 100 * yearDistanceWeight)
+                                             abs(basisYear - col("year")) / 100 * yearDistanceWeight + \
+                                             tagsSimilarityUdf(lit(movieId), col("movieId")) * tagsSimilarityWeight)
 
         recommendedMovies = moviesWithSim.sort("similarity", ascending=False).select("movieId", "title", "similarity").take(10)
 
