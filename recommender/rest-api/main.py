@@ -25,8 +25,8 @@ def getGenreTrending(genre):
 def makeRecommendations(userid):
     return RecommendationService().execute(userid)
 
-@app.route('/recommendations/movieid=<movieid>')
-def makeRecommendationsByContent(movieid):
+@app.route('/recommendations/userid=<userid>&&movieid=<movieid>')
+def makeRecommendationsByContent(userid, movieid):
     return ContentBaseService().execute(movieid)
 
 
