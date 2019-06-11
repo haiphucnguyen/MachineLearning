@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnChanges, OnInit, SimpleChanges} from '@angular/core';
 import {HttpService} from "../core/http.service";
-import {ActivatedRoute, NavigationExtras, Router} from "@angular/router";
+import {ActivatedRoute, NavigationExtras, Router, RouterStateSnapshot} from "@angular/router";
 
 @Component({
   selector: 'app-movie-page',
@@ -17,11 +17,32 @@ export class MoviePageComponent implements OnInit {
               private router: Router) { }
 
   ngOnInit() {
-    this.recommendMovies = this.activatedRoute.snapshot.data.res;
-    console.log(this.recommendMovies);
-    this.title = this.activatedRoute.snapshot.paramMap.get('title');
-    console.log(this.title);
+    // this.recommendMovies = this.activatedRoute.snapshot.data.res;
+    // console.log(this.recommendMovies);
+    this.title = this.activatedRoute.snapshot.params['title'];
+
+    const user_id = JSON.parse(localStorage.getItem('user')).user_id;
+    const movie_id = this.activatedRoute.snapshot.params['movie_id'];
+     this.httpService.loadMovie(user_id, movie_id).subscribe(data => {
+       this.recommendMovies = data;
+     });
   }
+
+  onChanges(): void {
+    this.activatedRoute.params.subscribe(v => {
+        this.title = v.get('title');
+
+        const user_id = JSON.parse(localStorage.getItem('user')).user_id;
+        const movie_id = v.get('movie_id');
+        console.log("In Movie page resolver", movie_id);
+         this.httpService.loadMovie(user_id, movie_id).subscribe(data => {
+           this.recommendMovies = data;
+         });
+    });
+
+  }
+
+
 
   selectMovie(movie: Movie) {
     let navigationExtras: NavigationExtras = {
@@ -30,6 +51,7 @@ export class MoviePageComponent implements OnInit {
       }
     };
     this.router.navigate([`/movie/${movie.movieid}`, {title: movie.moviename}]);
+    this.onChanges();
   }
 
 }

@@ -26,9 +26,9 @@ const routes: Routes = [
   {
     path: 'movie/:movie_id',
     component: MoviePageComponent,
-    resolve: {
-      res: MoviePageResolverService
-    }
+    // resolve: {
+    //   res: MoviePageResolverService
+    // }
   }
 ];
 

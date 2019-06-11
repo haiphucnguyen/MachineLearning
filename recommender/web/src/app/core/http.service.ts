@@ -25,8 +25,8 @@ export class HttpService {
     return this.httpClient.get<Movie[]>(`/trendings/${genre}`);
   }
 
-  loadMovie(user_id: string, movie_id: string): Observable<any> {
-    return this.httpClient.get(`/recommendations/userid=${user_id}&&movieid=${movie_id}`);
+  loadMovie(user_id: string, movie_id: string): Observable<Movie[]> {
+    return this.httpClient.get<Movie[]>(`/recommendations/userid=${user_id}&&movieid=${movie_id}`);
   }
 
 
