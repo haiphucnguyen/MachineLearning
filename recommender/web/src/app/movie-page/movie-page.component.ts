@@ -31,13 +31,13 @@ export class MoviePageComponent implements OnInit {
 
   onChanges(): void {
     this.activatedRoute.params.subscribe(v => {
-      if (this.currentMovieId !== v.movie_id) {
+      if (this.currentMovieId != v.movie_id) {
           this.title = v.title;
 
         const user_id = JSON.parse(localStorage.getItem('user')).user_id;
-        const movie_id = v.movie_id;
+        this.currentMovieId = v.movie_id;
         this.recommendMovies = [];
-         this.httpService.loadMovie(user_id, movie_id).subscribe(data => {
+         this.httpService.loadMovie(user_id, this.currentMovieId).subscribe(data => {
            this.recommendMovies = data;
          });
       }
