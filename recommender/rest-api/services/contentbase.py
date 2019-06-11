@@ -86,13 +86,29 @@ class ContentBaseService:
                 else:
                     tagsDict[tempMovieId] = [y]
 
+        titleWordsDict = {}
+        titlePandaDf = movies_df.toPandas()
+
+        for index, x in titlePandaDf.iterrows():
+            wordlist = str(x['title']).lower().split(' ')
+            tempMovieId = x['movieId']
+            for y in wordlist:
+                if tempMovieId in titleWordsDict:
+                    titleWordsDict[tempMovieId].append(y)
+                else:
+                    titleWordsDict[tempMovieId] = [y]
+
         genresSimilarityWeight = 0.8
         tagsSimilarityWeight = 2
+        titleSimilarityWeight = 1
         yearDistanceWeight = 0.1
         ratingAvgWeight = 0.2
 
-        def tagsSimilarityFunc(basisMovieID, checkedMovieID):
-            dictToCheck = tagsDict
+        def tagsSimilarityFunc(basisMovieID, checkedMovieID, checkType):
+            if checkType == 'tag':
+                dictToCheck = tagsDict
+            else:
+                dictToCheck = titleWordsDict
             counter = 0
             if basisMovieID in dictToCheck:
                 basisTags = dictToCheck[basisMovieID]
@@ -136,7 +152,8 @@ class ContentBaseService:
         moviesWithSim = movies_df.withColumn("similarity", consineUdf("genresMatrix") * genresSimilarityWeight + \
                                              abs(basisRatingAvg - col("mean_rating")) * ratingAvgWeight + \
                                              abs(basisYear - col("year")) / 100 * yearDistanceWeight + \
-                                             tagsSimilarityUdf(lit(movieId), col("movieId")) * tagsSimilarityWeight)
+                                             tagsSimilarityUdf(lit(movieId), col("movieId"), lit("tag")) * tagsSimilarityWeight + \
+                                             tagsSimilarityUdf(lit(movieId), col("movieId"), lit("title")) * titleSimilarityWeight)
 
         recommendedMovies = moviesWithSim.sort("similarity", ascending=False).select("movieId", "title", "similarity").take(10)
 
