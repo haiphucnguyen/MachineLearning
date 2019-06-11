@@ -30,14 +30,15 @@ export class MoviePageComponent implements OnInit {
 
   onChanges(): void {
     this.activatedRoute.params.subscribe(v => {
-        this.title = v.get('title');
+      console.log(v);
+      this.title = v.title;
 
-        const user_id = JSON.parse(localStorage.getItem('user')).user_id;
-        const movie_id = v.get('movie_id');
-        console.log("In Movie page resolver", movie_id);
-         this.httpService.loadMovie(user_id, movie_id).subscribe(data => {
-           this.recommendMovies = data;
-         });
+      const user_id = JSON.parse(localStorage.getItem('user')).user_id;
+      const movie_id = v.movie_id;
+      this.recommendMovies = [];
+       this.httpService.loadMovie(user_id, movie_id).subscribe(data => {
+         this.recommendMovies = data;
+       });
     });
 
   }
