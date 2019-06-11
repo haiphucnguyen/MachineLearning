@@ -23,10 +23,12 @@ def getGenreTrending(genre):
 
 @app.route('/recommendations/<userid>')
 def makeRecommendations(userid):
+    print("Recommendation with collaborative")
     return RecommendationService().execute(userid)
 
 @app.route('/recommendations/userid=<userid>&&movieid=<movieid>')
 def makeRecommendationsByContent(userid, movieid):
+    print("Recommendation with content")
     return ContentBaseService().execute(movieid)
 
 

@@ -75,6 +75,21 @@ class ContentBaseService:
 
         movies_df = movies_df.join(df_words_no_stopw, on="movieId", how="left").cache()
 
+        genresSimilarityWeight = 0.8
+        tagsSimilarityWeight = 2
+        titleSimilarityWeight = 1
+        yearDistanceWeight = 0.1
+        ratingAvgWeight = 0.2
+
+        basisGenres = movies_df.filter(movies_df['movieId'] == movieId).select("genresMatrix").collect()[0][0]
+        basisYear = movies_df.filter(movies_df['movieId'] == movieId).select('year').collect()[0][0]
+        basisRatingAvg = movies_df.filter(movies_df['movieId'] == movieId).select('mean_rating').collect()[0][0]
+
+        def consineFunc(genresVal):
+            return float(cosine(basisGenres, genresVal))
+
+        consineUdf = udf(consineFunc, DoubleType())
+
         tagsPandaDf = df_words_no_stopw.toPandas()
         tagsDict = {}
         for index, x in tagsPandaDf.iterrows():
@@ -90,6 +105,7 @@ class ContentBaseService:
         titleWordsDict = {}
         titlePandaDf = movies_df.toPandas()
 
+
         for index, x in titlePandaDf.iterrows():
             wordlist = str(x['title']).lower().split(' ')
             tempMovieId = x['movieId']
@@ -99,17 +115,12 @@ class ContentBaseService:
                 else:
                     titleWordsDict[tempMovieId] = [y]
 
-        genresSimilarityWeight = 0.8
-        tagsSimilarityWeight = 2
-        titleSimilarityWeight = 1
-        yearDistanceWeight = 0.1
-        ratingAvgWeight = 0.2
-
         def tagsSimilarityFunc(basisMovieID, checkedMovieID, checkType):
-            if checkType == 'tag':
+            if checkType == "tag":
                 dictToCheck = tagsDict
             else:
                 dictToCheck = titleWordsDict
+
             counter = 0
             if basisMovieID in dictToCheck:
                 basisTags = dictToCheck[basisMovieID]
@@ -132,32 +143,26 @@ class ContentBaseService:
                 checkedTags = list(checkedTags)
 
             else:
+                print("B")
                 return 0
 
             for x in basisTagsDict:
                 if x in checkedTags: counter += basisTagsDict[x]
+            print("C")
             return counter
 
         tagsSimilarityUdf = udf(tagsSimilarityFunc, FloatType())
 
-
-        basisGenres = movies_df.filter(movies_df['movieId'] == movieId).select("genresMatrix").collect()[0][0]
-        basisYear = movies_df.filter(movies_df['movieId'] == movieId).select('year').collect()[0][0]
-        basisRatingAvg = movies_df.filter(movies_df['movieId'] == movieId).select('mean_rating').collect()[0][0]
-
-        def consineFunc(genresVal):
-            return float(cosine(basisGenres, genresVal))
-
-        consineUdf = udf(consineFunc, DoubleType())
-
         moviesWithSim = movies_df.withColumn("similarity", consineUdf("genresMatrix") * genresSimilarityWeight + \
                                              abs(basisRatingAvg - col("mean_rating")) * ratingAvgWeight + \
                                              abs(basisYear - col("year")) / 100 * yearDistanceWeight + \
-                                             tagsSimilarityUdf(lit(movieId), col("movieId"), lit("tag")) * tagsSimilarityWeight + \
-                                             tagsSimilarityUdf(lit(movieId), col("movieId"), lit("title")) * titleSimilarityWeight)
+                                             tagsSimilarityUdf(lit(int(movieId)), col("movieId"), lit("tag")) * tagsSimilarityWeight + \
+                                             tagsSimilarityUdf(lit(int(movieId)), col("movieId"), lit("title")) * titleSimilarityWeight)
 
-        recommendedMovies = moviesWithSim.sort("similarity", ascending = False).filter(moviesWithSim["movieId"] != movieId).select("movieId", "title", "similarity").take(10)
-
+        recommendedMovies = moviesWithSim.sort("similarity", ascending=False).filter(moviesWithSim["movieId"] != movieId).select("movieId",
+                                                                                                             "title",
+                                                                                                             "similarity").take(10)
+        print(recommendedMovies)
         print("Return movie {}".format(movieId))
         data = []
         for r in recommendedMovies:
