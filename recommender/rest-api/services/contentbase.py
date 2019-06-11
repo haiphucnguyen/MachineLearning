@@ -25,6 +25,7 @@ class ContentBaseService:
         return movieGenresMatrix
 
     def execute(self, movieId):
+        print("Get content movies {}".format(movieId))
         spark = SparkSession.builder.appName("Recommendation ALS").config("spark.executor.memory", "3g") \
             .config("spark.driver.cores", "4").getOrCreate()
 
@@ -155,8 +156,9 @@ class ContentBaseService:
                                              tagsSimilarityUdf(lit(movieId), col("movieId"), lit("tag")) * tagsSimilarityWeight + \
                                              tagsSimilarityUdf(lit(movieId), col("movieId"), lit("title")) * titleSimilarityWeight)
 
-        recommendedMovies = moviesWithSim.sort("similarity", ascending=False).select("movieId", "title", "similarity").take(10)
+        recommendedMovies = moviesWithSim.sort("similarity", ascending = False).filter(moviesWithSim["movieId"] != movieId).select("movieId", "title", "similarity").take(10)
 
+        print("Return movie {}".format(movieId))
         data = []
         for r in recommendedMovies:
             data.append(MovieEntry(r['movieId'], r['title'], "UrL %s" % r['title'], r['similarity']))
