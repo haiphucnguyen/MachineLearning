@@ -1,6 +1,6 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.types import ArrayType as Arr, IntegerType, StringType, DoubleType, FloatType
-from pyspark.sql.functions import col, count, mean, udf, UserDefinedFunction, regexp_replace, concat, collect_set, when, abs, lit
+from pyspark.sql.functions import col, count, mean, udf, regexp_replace, concat, collect_set, when, abs, lit
 from pyspark.ml.feature import Tokenizer, StopWordsRemover
 from functools import reduce
 from scipy.spatial.distance import cosine
