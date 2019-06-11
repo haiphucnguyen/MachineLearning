@@ -11,6 +11,7 @@ export class MoviePageComponent implements OnInit {
 
   public recommendMovies: Movie[] = [];
   public title = '';
+  public currentMovieId;
 
   constructor(private httpService: HttpService,
               private activatedRoute: ActivatedRoute,
@@ -22,23 +23,25 @@ export class MoviePageComponent implements OnInit {
     this.title = this.activatedRoute.snapshot.params['title'];
 
     const user_id = JSON.parse(localStorage.getItem('user')).user_id;
-    const movie_id = this.activatedRoute.snapshot.params['movie_id'];
-     this.httpService.loadMovie(user_id, movie_id).subscribe(data => {
+    this.currentMovieId = this.activatedRoute.snapshot.params['movie_id'];
+     this.httpService.loadMovie(user_id, this.currentMovieId).subscribe(data => {
        this.recommendMovies = data;
      });
   }
 
   onChanges(): void {
     this.activatedRoute.params.subscribe(v => {
-      console.log(v);
-      this.title = v.title;
+      if (this.currentMovieId !== v.movie_id) {
+          this.title = v.title;
 
-      const user_id = JSON.parse(localStorage.getItem('user')).user_id;
-      const movie_id = v.movie_id;
-      this.recommendMovies = [];
-       this.httpService.loadMovie(user_id, movie_id).subscribe(data => {
-         this.recommendMovies = data;
-       });
+        const user_id = JSON.parse(localStorage.getItem('user')).user_id;
+        const movie_id = v.movie_id;
+        this.recommendMovies = [];
+         this.httpService.loadMovie(user_id, movie_id).subscribe(data => {
+           this.recommendMovies = data;
+         });
+      }
+
     });
 
   }
