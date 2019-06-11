@@ -143,12 +143,10 @@ class ContentBaseService:
                 checkedTags = list(checkedTags)
 
             else:
-                print("B")
                 return 0
 
             for x in basisTagsDict:
                 if x in checkedTags: counter += basisTagsDict[x]
-            print("C")
             return counter
 
         tagsSimilarityUdf = udf(tagsSimilarityFunc, FloatType())
@@ -163,7 +161,6 @@ class ContentBaseService:
                                                                                                              "title",
                                                                                                              "similarity").take(10)
         print(recommendedMovies)
-        print("Return movie {}".format(movieId))
         data = []
         for r in recommendedMovies:
             data.append(MovieEntry(r['movieId'], r['title'], "UrL %s" % r['title'], r['similarity']))
