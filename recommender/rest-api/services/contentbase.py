@@ -78,13 +78,13 @@ class ContentBaseService:
         tagsDict = {}
         for index, x in tagsPandaDf.iterrows():
             wordlist = x['tags_clean']
-            movieId = x['movieId']
+            tempMovieId = x['movieId']
             for y in wordlist:
-                if movieId in tagsDict:
+                if tempMovieId in tagsDict:
                     # if y not in tagsDict[movieId]:  # Switched off (we will get a non unique list)
-                    tagsDict[movieId].append(y)
+                    tagsDict[tempMovieId].append(y)
                 else:
-                    tagsDict[movieId] = [y]
+                    tagsDict[tempMovieId] = [y]
 
         genresSimilarityWeight = 0.8
         tagsSimilarityWeight = 2
