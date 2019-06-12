@@ -14,7 +14,7 @@ export class HttpService {
   }
 
   loadRecommendMoviesForUser(user_id): Observable<any> {
-    return this.httpClient.get(`/recommendations/${user_id}`);
+    return this.httpClient.get(`/recommendations/userid=${user_id}`);
   }
 
   loadTrendingMovie(): Observable<TrendingMovie[]> {
