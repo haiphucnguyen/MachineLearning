@@ -77,7 +77,7 @@ class ContentBaseService:
 
         genresSimilarityWeight = 0.8
         tagsSimilarityWeight = 2
-        titleSimilarityWeight = 1
+        titleSimilarityWeight = 2
         yearDistanceWeight = 0.1
         ratingAvgWeight = 0.2
 
@@ -121,7 +121,7 @@ class ContentBaseService:
             else:
                 dictToCheck = titleWordsDict
 
-            counter = 0
+            counter = 0.01
             if basisMovieID in dictToCheck:
                 basisTags = dictToCheck[basisMovieID]
                 countAllTags = len(basisTags)
@@ -135,7 +135,7 @@ class ContentBaseService:
                 for x in basisTagsDict:
                     basisTagsDict[x] = basisTagsDict[x] / countAllTags
             else:
-                return 0
+                return 0.01
 
             if checkedMovieID in dictToCheck:
                 checkedTags = dictToCheck[checkedMovieID]
@@ -143,10 +143,13 @@ class ContentBaseService:
                 checkedTags = list(checkedTags)
 
             else:
-                return 0
+                return 0.01
 
             for x in basisTagsDict:
                 if x in checkedTags: counter += basisTagsDict[x]
+
+            if (checkedMovieID == 1221):
+                print("Counter {} {} {} {}".format(counter, basisMovieID, checkedMovieID, checkType))
             return counter
 
         tagsSimilarityUdf = udf(tagsSimilarityFunc, FloatType())
@@ -154,12 +157,12 @@ class ContentBaseService:
         moviesWithSim = movies_df.withColumn("similarity", consineUdf("genresMatrix") * genresSimilarityWeight + \
                                              abs(basisRatingAvg - col("mean_rating")) * ratingAvgWeight + \
                                              abs(basisYear - col("year")) / 100 * yearDistanceWeight + \
-                                             tagsSimilarityUdf(lit(int(movieId)), col("movieId"), lit("tag")) * tagsSimilarityWeight + \
-                                             tagsSimilarityUdf(lit(int(movieId)), col("movieId"), lit("title")) * titleSimilarityWeight)
+                                             - tagsSimilarityUdf(lit(int(movieId)), col("movieId"), lit("tag")) * tagsSimilarityWeight + \
+                                             - tagsSimilarityUdf(lit(int(movieId)), col("movieId"), lit("title")) * titleSimilarityWeight)
 
-        recommendedMovies = moviesWithSim.sort("similarity", ascending=False).filter(moviesWithSim["movieId"] != movieId).select("movieId",
-                                                                                                             "title",
-                                                                                                             "similarity").take(10)
+        recommendedMovies = moviesWithSim.sort("similarity", ascending = True).filter(moviesWithSim["movieId"] != movieId).\
+            select("movieId", "title", "similarity").take(10)
+
         print(recommendedMovies)
         data = []
         for r in recommendedMovies:
