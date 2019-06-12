@@ -25,6 +25,7 @@ class RecommendationService:
 
         recommendedMovies = movies_df.filter(movies_df["movieId"].isin(movieIds)).collect()
 
+        print(recommendedMovies)
         data = []
         for r in recommendedMovies:
             data.append(MovieEntry(r['movieId'], r['title'], "UrL %s" % r['title'], ""))

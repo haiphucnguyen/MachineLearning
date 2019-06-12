@@ -21,7 +21,7 @@ def getGenreTrending(genre):
     return TrendingService().getGenreTrending(genre)
 
 
-@app.route('/recommendations/<userid>')
+@app.route('/recommendations/userid=<userid>')
 def makeRecommendations(userid):
     print("Recommendation with collaborative")
     return RecommendationService().execute(userid)
