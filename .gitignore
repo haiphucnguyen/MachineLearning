@@ -105,3 +105,5 @@ venv.bak/
 
 #idea
 /.idea
+object-detection/backend/notes/ssd_mobilenet_v2_coco_2018_03_29.tar.gz
+object-detection/backend/notes/ssd_mobilenet_v2_coco_2018_03_29/frozen_inference_graph.pb
