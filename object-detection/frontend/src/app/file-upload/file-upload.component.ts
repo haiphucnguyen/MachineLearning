@@ -17,12 +17,14 @@ export class FileUploadComponent implements ControlValueAccessor {
 
   @Input() progress;
   onChange: Function;
-  private file: File[] | null = [];
+  private file: File[] | null = null;
 
   @HostListener('change', ['$event.target.files']) emitFiles( event: FileList ) {
     console.log(event);
-    const file = event && event.item(0);
     this.onChange(event);
+    if(!this.file) {
+      this.file = [];
+    }
     for (let i=0; i <event.length; i++) {
       this.file.push(event.item(i));
     }
@@ -34,7 +36,7 @@ export class FileUploadComponent implements ControlValueAccessor {
   writeValue( value: null ) {
     // clear file input
     this.host.nativeElement.value = '';
-    this.file = [];
+    this.file = null;
   }
 
   registerOnChange( fn: Function ) {
