@@ -13,7 +13,9 @@
 
 </form>
 
-<div class="result">
 
+<a href="javascript:void(0)" (click)="detectObject()">Detect Object</a>
+<div class="result" innerHTML="plotHtml">
 </div>
+<img src="{{plotSrc}}" />
 <router-outlet></router-outlet>

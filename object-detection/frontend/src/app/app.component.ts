@@ -1,7 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {WebcamImage} from "ngx-webcam";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
-import {HttpClient, HttpEventType, HttpHeaders} from "@angular/common/http";
+import {HttpClient, HttpEventType, HttpHeaders, HttpResponse} from "@angular/common/http";
+import {DomSanitizer} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-root',
@@ -13,8 +14,9 @@ export class AppComponent implements OnInit{
   public webcamImages: WebcamImage[] = [];
   formGroup: FormGroup;
   progress = 0;
+  plotSrc;
 
-  constructor(private httpClient: HttpClient) {
+  constructor(private httpClient: HttpClient, protected sanitizer: DomSanitizer) {
 
   }
 
@@ -77,6 +79,22 @@ export class AppComponent implements OnInit{
 
   takePicture($event) {
     this.webcamImages.push($event);
+  }
+
+  detectObject() {
+    this.httpClient.get<Blob>('plot', { responseType: 'blob' as 'json' }).subscribe((response) => {
+        this.createImageFromBlob(response);
+    });
+  }
+
+  createImageFromBlob(image: Blob) {
+    let reader = new FileReader();
+    reader.addEventListener("load", () => {
+      this.plotSrc = reader.result;
+    }, false);
+    if (image) {
+      reader.readAsDataURL(image);
+    }
   }
 
 }
