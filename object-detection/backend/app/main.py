@@ -4,8 +4,7 @@ import os
 import io
 import numpy as np
 import matplotlib.pyplot as plt, mpld3
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-from matplotlib.figure import Figure
+import matplotlib.image as mpimg
 
 # the all-important app variable:
 app = Flask(__name__)
@@ -19,7 +18,14 @@ def uploadFiles():
         file_name = secure_filename(file.filename)
         file.save(os.path.join('upload', file_name))
 
-    return "Successfully"
+    fig = plt.figure()
+    img = mpimg.imread(file)
+    plt.imshow(img)
+
+    img = io.BytesIO()
+    fig.savefig(img)
+    img.seek(0)
+    return send_file(img, mimetype='image/png')
 
 @app.route("/detect")
 def detectObject():
@@ -31,8 +37,8 @@ def detectObject():
     plt.ylabel('ylabel(Y)')
     plt.title('Simple Graph!')
     plt.grid(True)
-    res = plt.savefig('plot.png', format='png')
-    return Response(res, mimetype='image/jpeg')
+
+    return jsonify([mpld3.fig_to_html(plt.figure())])
 
 @app.route('/plot')
 def plot():

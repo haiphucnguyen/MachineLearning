@@ -16,22 +16,24 @@ export class AppComponent implements OnInit{
   progress = 0;
   plotSrc;
 
-  constructor(private httpClient: HttpClient, protected sanitizer: DomSanitizer) {
+  constructor(private httpClient: HttpClient) {
 
   }
 
   ngOnInit(): void {
     this.formGroup = new FormGroup({
-    image: new FormControl(null, [Validators.required, this.requiredFileType(['png', 'jpg', 'jpeg'])])
+      image: new FormControl(null, [Validators.required, this.requiredFileType(['png', 'jpg', 'jpeg'])])
   });
   }
 
   requiredFileType(types: string[] ) {
     return function (control: FormControl) {
       const file = control.value;
+      console.log(file);
       if (file) {
         for (let i = 0; i < file.length; i++) {
           const extension = file.item(i).name.split('.')[1].toLowerCase();
+          console.log(extension);
           types.forEach(type => {
             if (type.toLowerCase() !== extension.toLowerCase() ) {
               return {
@@ -42,15 +44,21 @@ export class AppComponent implements OnInit{
         }
         return null;
       }
-
-      return null;
+      return {
+        requiredFileType: true
+      };
     };
   }
 
   submit() {
-    this.httpClient.post('upload', this.toFormData(this.formGroup.get('image').value), {
+    let formValue = this.formGroup.get('image').value;
+    if(!formValue) {
+      return;
+    }
+    this.httpClient.post('upload', this.toFormData(formValue), {
       reportProgress: true,
-      observe: 'events'
+      observe: 'events',
+      responseType: 'blob' as 'json'
     }).subscribe(event => {
 
       if ( event.type === HttpEventType.UploadProgress) {
@@ -60,17 +68,20 @@ export class AppComponent implements OnInit{
       if ( event.type === HttpEventType.Response ) {
         console.log(event.body);
         this.formGroup.reset();
+        this.formGroup.controls['image'].setValue(null);
+        this.createImageFromBlob(<Blob> event.body);
+
       }
 
     });
   }
+
 
   toFormData<T>(formValue: T) {
     const formData = new FormData();
 
     for ( const key of Object.keys(formValue) ) {
       const value = formValue[key];
-      console.log(key, value);
       formData.append(key, value);
     }
 
