@@ -1,5 +1,7 @@
 FROM jupyter/tensorflow-notebook
 
+COPY app /app
+
 USER root
 
 RUN sudo apt-get update && apt-get install -y protobuf-compiler python-pil python-lxml python-tk
