@@ -78,11 +78,11 @@ export class AppComponent implements OnInit {
 
   uploadFromWebcam() {
     let files: File[] = [];
-    let i = 0;
     this.webcamImages.forEach(wcImg => {
       let blob = this.dataURItoBlob(wcImg.imageAsDataUrl);
-      files.push(new File([blob], 'img_wc_' + i + '.png', {type: 'image/png'}));
-      i++;
+      let date = new Date();
+      let timestamp = date.getTime();
+      files.push(new File([blob], timestamp + '.png', {type: 'image/png'}));
     });
     this.httpClient.post('upload', this.toFormData(files), {
       reportProgress: true,
