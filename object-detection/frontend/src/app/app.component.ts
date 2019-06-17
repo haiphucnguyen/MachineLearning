@@ -73,7 +73,7 @@ export class AppComponent implements OnInit {
         console.log(event.body);
         this.formGroup.reset();
         this.formGroup.controls['image'].setValue(null);
-        this.createImageFromBlob(<Blob>event.body);
+        this.plotSrc = this.createImageFromBlob(<Blob>event.body);
 
       }
 
@@ -117,8 +117,14 @@ export class AppComponent implements OnInit {
     const formData = new FormData();
     for (const key of Object.keys(formValue)) {
       const value = formValue[key];
-      console.log((<ImageData>value));
-      this.originalImg = (<HTMLImageElement>value).src;
+      let reader = new FileReader();
+      reader.addEventListener("load", () => {
+        this.originalImg = reader.result;
+      }, false);
+      if (value) {
+        reader.readAsDataURL(value);
+      }
+
       formData.append(key, value);
     }
 
