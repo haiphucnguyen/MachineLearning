@@ -1,0 +1,19 @@
+<app-header></app-header>
+<app-camera (pictureTaken)="takePicture($event)"></app-camera>
+  <div *ngFor="let img of webcamImages">
+    <img [src]="img.imageAsDataUrl" width="200" height="100">
+  </div>
+
+  <br/>
+<form [formGroup]="formGroup" (ngSubmit)="submit()">
+
+  <app-file-upload formControlName="image" [progress]="progress"></app-file-upload>
+
+  <button class="btn-upload">Upload Training Images</button>
+
+</form>
+
+<div class="result">
+
+</div>
+<router-outlet></router-outlet>

@@ -1,13 +1,20 @@
-from flask import Flask
-import matplotlib.pyplot as plt, mpld3
+from flask import Flask, request
+from werkzeug.utils import secure_filename
+import os
 
 # the all-important app variable:
 app = Flask(__name__)
 
-@app.route("/")
-def index():
-    plt.plot([3, 1, 4, 1, 5], 'ks-', mec='w', mew=5, ms=20)
-    return mpld3.show()
+@app.route("/upload", methods=['POST'])
+def uploadFiles():
+    images = request.files.to_dict()
+    print(images)
+    for image in images:
+        file = images[image]
+        file_name = secure_filename(file.filename)
+        file.save(os.path.join('upload', file_name))
+
+    return "Successfully"
 
 
 if __name__ == '__main__':
