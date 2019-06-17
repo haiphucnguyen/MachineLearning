@@ -9,7 +9,7 @@ import {DomSanitizer} from "@angular/platform-browser";
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit{
+export class AppComponent implements OnInit {
   title = 'frontend';
   public webcamImages: WebcamImage[] = [];
   formGroup: FormGroup;
@@ -23,10 +23,10 @@ export class AppComponent implements OnInit{
   ngOnInit(): void {
     this.formGroup = new FormGroup({
       image: new FormControl(null, [Validators.required, this.requiredFileType(['png', 'jpg', 'jpeg'])])
-  });
+    });
   }
 
-  requiredFileType(types: string[] ) {
+  requiredFileType(types: string[]) {
     return function (control: FormControl) {
       const file = control.value;
       console.log(file);
@@ -35,7 +35,7 @@ export class AppComponent implements OnInit{
           const extension = file.item(i).name.split('.')[1].toLowerCase();
           console.log(extension);
           types.forEach(type => {
-            if (type.toLowerCase() !== extension.toLowerCase() ) {
+            if (type.toLowerCase() !== extension.toLowerCase()) {
               return {
                 requiredFileType: true
               };
@@ -52,7 +52,7 @@ export class AppComponent implements OnInit{
 
   submit() {
     let formValue = this.formGroup.get('image').value;
-    if(!formValue) {
+    if (!formValue) {
       return;
     }
     this.httpClient.post('upload', this.toFormData(formValue), {
@@ -61,26 +61,76 @@ export class AppComponent implements OnInit{
       responseType: 'blob' as 'json'
     }).subscribe(event => {
 
-      if ( event.type === HttpEventType.UploadProgress) {
+      if (event.type === HttpEventType.UploadProgress) {
         this.progress = Math.round((100 * event.loaded) / event.total);
       }
 
-      if ( event.type === HttpEventType.Response ) {
+      if (event.type === HttpEventType.Response) {
         console.log(event.body);
         this.formGroup.reset();
         this.formGroup.controls['image'].setValue(null);
-        this.createImageFromBlob(<Blob> event.body);
+        this.createImageFromBlob(<Blob>event.body);
 
       }
 
     });
   }
 
+  uploadFromWebcam() {
+    let files: File[] = [];
+    let i = 0;
+    this.webcamImages.forEach(wcImg => {
+      let blob = this.dataURItoBlob(wcImg.imageAsDataUrl);
+      files.push(new File([blob], 'img_wc_' + i + '.png', {type: 'image/png'}));
+      i++;
+    });
+    this.httpClient.post('upload', this.toFormData(files), {
+      reportProgress: true,
+      observe: 'events',
+      responseType: 'blob' as 'json'
+    }).subscribe(event => {
+
+      if (event.type === HttpEventType.UploadProgress) {
+        this.progress = Math.round((100 * event.loaded) / event.total);
+      }
+
+      if (event.type === HttpEventType.Response) {
+        console.log(event.body);
+        this.formGroup.reset();
+        this.formGroup.controls['image'].setValue(null);
+        this.createImageFromBlob(<Blob>event.body);
+
+      }
+
+    });
+  }
+
+  dataURItoBlob(dataURI) {
+
+    // convert base64/URLEncoded data component to raw binary data held in a string
+    var byteString;
+    if (dataURI.split(',')[0].indexOf('base64') >= 0)
+      byteString = atob(dataURI.split(',')[1]);
+    else
+      byteString = unescape(dataURI.split(',')[1]);
+
+    // separate out the mime component
+    var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+    // write the bytes of the string to a typed array
+    var ia = new Uint8Array(byteString.length);
+    for (var i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+
+    return new Blob([ia], {type: mimeString});
+  }
+
 
   toFormData<T>(formValue: T) {
     const formData = new FormData();
 
-    for ( const key of Object.keys(formValue) ) {
+    for (const key of Object.keys(formValue)) {
       const value = formValue[key];
       formData.append(key, value);
     }
@@ -93,8 +143,8 @@ export class AppComponent implements OnInit{
   }
 
   detectObject() {
-    this.httpClient.get<Blob>('plot', { responseType: 'blob' as 'json' }).subscribe((response) => {
-        this.createImageFromBlob(response);
+    this.httpClient.get<Blob>('plot', {responseType: 'blob' as 'json'}).subscribe((response) => {
+      this.createImageFromBlob(response);
     });
   }
 

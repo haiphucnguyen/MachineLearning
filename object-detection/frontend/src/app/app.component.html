@@ -3,7 +3,7 @@
   <div *ngFor="let img of webcamImages">
     <img [src]="img.imageAsDataUrl" width="200" height="100">
   </div>
-
+<a href="javascript:void(0)" (click)="uploadFromWebcam()">Upload from Webcam</a>
   <br/>
 <form [formGroup]="formGroup" (ngSubmit)="submit()">
 
