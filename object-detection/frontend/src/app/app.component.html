@@ -1,11 +1,10 @@
 <app-header></app-header>
 <app-camera (pictureTaken)="takePicture($event)"></app-camera>
-  <div *ngFor="let img of webcamImages">
-    <img [src]="img.imageAsDataUrl" width="200" height="100">
-  </div>
-<a href="javascript:void(0)" (click)="uploadFromWebcam()">Upload from Webcam</a>
-  <br/>
-<form [formGroup]="formGroup" (ngSubmit)="submit()">
+<img *ngFor="let img of webcamImages" [src]="img.imageAsDataUrl" width="200" class="img-wc">
+<br/>
+<button (click)="uploadFromWebcam()" class="btn-upload">Upload from Webcam</button>
+
+<form [formGroup]="formGroup" (ngSubmit)="submit()" class="upload-form">
 
   <app-file-upload formControlName="image" [progress]="progress"></app-file-upload>
 
@@ -13,9 +12,18 @@
 
 </form>
 
-
-<a href="javascript:void(0)" (click)="detectObject()">Detect Object</a>
-<div class="result" innerHTML="plotHtml">
+<div class="result">
+  <figure>
+    <img src="{{originalImg}}" alt="Original" width="450"/>
+    <figcaption>Original</figcaption>
+  </figure>
+  <figure>
+    <img src="{{plotSrc}}" alt="Object detected" width="450"/>
+    <figcaption>Object detected</figcaption>
+  </figure>
+  <figure>
+    <img src="{{originalImg}}" alt="Class Activation Map" width="450"/>
+    <figcaption>Class Activation Map</figcaption>
+  </figure>
 </div>
-<img src="{{plotSrc}}" />
 <router-outlet></router-outlet>

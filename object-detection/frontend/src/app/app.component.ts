@@ -15,6 +15,7 @@ export class AppComponent implements OnInit {
   formGroup: FormGroup;
   progress = 0;
   plotSrc;
+  originalImg;
 
   constructor(private httpClient: HttpClient) {
 
@@ -33,7 +34,6 @@ export class AppComponent implements OnInit {
       if (file) {
         for (let i = 0; i < file.length; i++) {
           const extension = file.item(i).name.split('.')[1].toLowerCase();
-          console.log(extension);
           types.forEach(type => {
             if (type.toLowerCase() !== extension.toLowerCase()) {
               return {
@@ -55,6 +55,10 @@ export class AppComponent implements OnInit {
     if (!formValue) {
       return;
     }
+    this.uploadAndDetectObject(formValue);
+  }
+
+  private uploadAndDetectObject(formValue) {
     this.httpClient.post('upload', this.toFormData(formValue), {
       reportProgress: true,
       observe: 'events',
@@ -79,34 +83,16 @@ export class AppComponent implements OnInit {
   uploadFromWebcam() {
     let files: File[] = [];
     this.webcamImages.forEach(wcImg => {
+      this.originalImg = wcImg.imageAsDataUrl;
       let blob = this.dataURItoBlob(wcImg.imageAsDataUrl);
       let date = new Date();
       let timestamp = date.getTime();
       files.push(new File([blob], timestamp + '.png', {type: 'image/png'}));
     });
-    this.httpClient.post('upload', this.toFormData(files), {
-      reportProgress: true,
-      observe: 'events',
-      responseType: 'blob' as 'json'
-    }).subscribe(event => {
-
-      if (event.type === HttpEventType.UploadProgress) {
-        this.progress = Math.round((100 * event.loaded) / event.total);
-      }
-
-      if (event.type === HttpEventType.Response) {
-        console.log(event.body);
-        this.formGroup.reset();
-        this.formGroup.controls['image'].setValue(null);
-        this.createImageFromBlob(<Blob>event.body);
-
-      }
-
-    });
+    this.uploadAndDetectObject(files);
   }
 
   dataURItoBlob(dataURI) {
-
     // convert base64/URLEncoded data component to raw binary data held in a string
     var byteString;
     if (dataURI.split(',')[0].indexOf('base64') >= 0)
@@ -129,9 +115,10 @@ export class AppComponent implements OnInit {
 
   toFormData<T>(formValue: T) {
     const formData = new FormData();
-
     for (const key of Object.keys(formValue)) {
       const value = formValue[key];
+      console.log((<ImageData>value));
+      this.originalImg = (<HTMLImageElement>value).src;
       formData.append(key, value);
     }
 
@@ -140,12 +127,6 @@ export class AppComponent implements OnInit {
 
   takePicture($event) {
     this.webcamImages.push($event);
-  }
-
-  detectObject() {
-    this.httpClient.get<Blob>('plot', {responseType: 'blob' as 'json'}).subscribe((response) => {
-      this.createImageFromBlob(response);
-    });
   }
 
   createImageFromBlob(image: Blob) {
