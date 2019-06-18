@@ -1,9 +1,31 @@
+import sys
+sys.path.append("./keras-ssd")
+
+from keras import backend as K
+from keras.models import load_model
+from keras.preprocessing import image
+from keras.optimizers import Adam
+from imageio import imread
+import numpy as np
+from matplotlib import pyplot as plt
+
+from models.keras_ssd300 import ssd_300
+from keras_loss_function.keras_ssd_loss import SSDLoss
+from keras_layers.keras_layer_AnchorBoxes import AnchorBoxes
+from keras_layers.keras_layer_DecodeDetections import DecodeDetections
+from keras_layers.keras_layer_DecodeDetectionsFast import DecodeDetectionsFast
+from keras_layers.keras_layer_L2Normalization import L2Normalization
+
+from ssd_encoder_decoder.ssd_output_decoder import decode_detections, decode_detections_fast
+
+from data_generator.object_detection_2d_data_generator import DataGenerator
+from data_generator.object_detection_2d_photometric_ops import ConvertTo3Channels
+from data_generator.object_detection_2d_geometric_ops import Resize
+from data_generator.object_detection_2d_misc_utils import apply_inverse_transforms
 from flask import Flask, request, jsonify, send_file, Response
 from werkzeug.utils import secure_filename
 import os
 import io
-import numpy as np
-import mpld3
 import matplotlib.image as mpimg
 
 import six.moves.urllib as urllib
@@ -20,11 +42,53 @@ from PIL import Image
 # the all-important app variable:
 app = Flask(__name__)
 
+img_height = 300
+img_width = 300
+
+def buildModel():
+    tmpModel = ssd_300(image_size=(img_height, img_width, 3),
+                    n_classes=20,
+                    mode='inference',
+                    l2_regularization=0.0005,
+                    scales=[0.1, 0.2, 0.37, 0.54, 0.71, 0.88, 1.05],
+                    # The scales for MS COCO are [0.07, 0.15, 0.33, 0.51, 0.69, 0.87, 1.05]
+                    aspect_ratios_per_layer=[[1.0, 2.0, 0.5],
+                                             [1.0, 2.0, 0.5, 3.0, 1.0 / 3.0],
+                                             [1.0, 2.0, 0.5, 3.0, 1.0 / 3.0],
+                                             [1.0, 2.0, 0.5, 3.0, 1.0 / 3.0],
+                                             [1.0, 2.0, 0.5],
+                                             [1.0, 2.0, 0.5]],
+                    two_boxes_for_ar1=True,
+                    steps=[8, 16, 32, 64, 100, 300],
+                    offsets=[0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
+                    clip_boxes=False,
+                    variances=[0.1, 0.1, 0.2, 0.2],
+                    normalize_coords=True,
+                    subtract_mean=[123, 117, 104],
+                    swap_channels=[2, 1, 0],
+                    confidence_thresh=0.5,
+                    iou_threshold=0.45,
+                    top_k=200,
+                    nms_max_output_size=400)
+
+    # 2: Load the trained weights into the model.
+
+    # TODO: Set the path of the trained weights.
+    weights_path = '../../../app/keras-ssd/data/VGG_VOC0712Plus_SSD_300x300_iter_240000.h5'
+
+    tmpModel.load_weights(weights_path, by_name=True)
+
+    # 3: Compile the model so that Keras won't complain the next time you load it.
+
+    adam = Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+    ssd_loss = SSDLoss(neg_pos_ratio=3, alpha=1.0)
+    tmpModel.compile(optimizer=adam, loss=ssd_loss.compute_loss)
+    return tmpModel
+
 
 @app.route("/upload", methods=['POST'])
 def uploadFiles():
     images = request.files.to_dict()
-    print(images)
     for image in images:
         file = images[image]
         file_name = secure_filename(file.filename)
@@ -36,117 +100,55 @@ def uploadFiles():
     img.seek(0)
     return send_file(img, mimetype='image/png')
 
-
 def detectObjects(image_name):
-    sys.path.append("./models-1.13.0/research")
-    from object_detection.utils import label_map_util
-    from object_detection.utils import visualization_utils as vis_util
-    # What model to download.
-    MODEL_NAME = 'ssd_mobilenet_v2_coco_2018_03_29'
-    MODEL_FILE = MODEL_NAME + '.tar.gz'
-    DOWNLOAD_BASE = 'http://download.tensorflow.org/models/object_detection/'
+    K.clear_session()
+    model = buildModel()
 
-    # Path to frozen detection graph. This is the actual model that is used for the object detection.
-    PATH_TO_CKPT = MODEL_NAME + '/frozen_inference_graph.pb'
+    orig_images = []  # Store the images here.
+    input_images = []  # Store resized versions of the images here.
 
-    # List of the strings that is used to add correct label for each box.
-    PATH_TO_LABELS = os.path.join(os.getcwd(), 'models-1.13.0/research/object_detection/data/mscoco_label_map.pbtxt')
+    # We'll only load one image in this example.
+    img_path = os.path.join('upload', image_name)
 
-    NUM_CLASSES = 90
-    IMAGE_SIZE = (20, 16)
+    orig_images.append(imread(img_path))
+    img = image.load_img(img_path, target_size=(img_height, img_width))
+    img = image.img_to_array(img)
+    input_images.append(img)
+    input_images = np.array(input_images)
 
-    opener = urllib.request.URLopener()
-    opener.retrieve(DOWNLOAD_BASE + MODEL_FILE, MODEL_FILE)
-    tar_file = tarfile.open(MODEL_FILE)
-    for file in tar_file.getmembers():
-        file_name = os.path.basename(file.name)
-        if 'frozen_inference_graph.pb' in file_name:
-            tar_file.extract(file, os.getcwd())
+    y_pred = model.predict(input_images)
 
-    detection_graph = tf.Graph()
-    with detection_graph.as_default():
-        od_graph_def = tf.GraphDef()
-        with tf.gfile.GFile(PATH_TO_CKPT, 'rb') as fid:
-            serialized_graph = fid.read()
-            od_graph_def.ParseFromString(serialized_graph)
-            tf.import_graph_def(od_graph_def, name='')
+    confidence_threshold = 0.5
+    y_pred_thresh = [y_pred[k][y_pred[k, :, 1] > confidence_threshold] for k in range(y_pred.shape[0])]
+    np.set_printoptions(precision=2, suppress=True, linewidth=90)
 
-    label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
-    categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=NUM_CLASSES, \
-                                                                use_display_name=True)
-    category_index = label_map_util.create_category_index(categories)
+    colors = plt.cm.hsv(np.linspace(0, 1, 21)).tolist()
+    classes = ['background',
+               'aeroplane', 'bicycle', 'bird', 'boat',
+               'bottle', 'bus', 'car', 'cat',
+               'chair', 'cow', 'diningtable', 'dog',
+               'horse', 'motorbike', 'person', 'pottedplant',
+               'sheep', 'sofa', 'train', 'tvmonitor']
 
-    image = Image.open(os.path.join('upload', image_name))
-
-    image_np = load_image_into_numpy_array(image)
-    # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
-    image_np_expanded = np.expand_dims(image_np, axis=0)
-    # Actual detection.
-    output_dict = run_inference_for_single_image(image_np_expanded, detection_graph)
-    # Visualization of the results of a detection.
-    vis_util.visualize_boxes_and_labels_on_image_array(
-        image_np,
-        output_dict['detection_boxes'],
-        output_dict['detection_classes'],
-        output_dict['detection_scores'],
-        category_index,
-        instance_masks=output_dict.get('detection_masks'),
-        use_normalized_coordinates=True,
-        line_thickness=8)
-
-    fig = plt.figure(figsize=IMAGE_SIZE)
-    plt.imshow(image_np)
+    fig = plt.figure(figsize=(20, 12))
+    plt.imshow(orig_images[0])
     plt.axis("off")
 
+    current_axis = plt.gca()
+
+    for box in y_pred_thresh[0]:
+        # Transform the predicted bounding boxes for the 300x300 image to the original image dimensions.
+        xmin = box[2] * orig_images[0].shape[1] / img_width
+        ymin = box[3] * orig_images[0].shape[0] / img_height
+        xmax = box[4] * orig_images[0].shape[1] / img_width
+        ymax = box[5] * orig_images[0].shape[0] / img_height
+        color = colors[int(box[0])]
+        label = '{}: {:.2f}'.format(classes[int(box[0])], box[1])
+        current_axis.add_patch(
+            plt.Rectangle((xmin, ymin), xmax - xmin, ymax - ymin, color=color, fill=False, linewidth=2))
+        current_axis.text(xmin, ymin, label, size='x-large', color='white', bbox={'facecolor': color, 'alpha': 1.0})
     return fig
-
-
-def load_image_into_numpy_array(image):
-    (im_width, im_height) = image.size
-    return np.array(image.getdata()).reshape((im_height, im_width, 3)).astype(np.uint8)
-
-
-def run_inference_for_single_image(image, graph):
-    with graph.as_default():
-        with tf.Session() as sess:
-            # Get handles to input and output tensors
-            ops = tf.get_default_graph().get_operations()
-            all_tensor_names = {output.name for op in ops for output in op.outputs}
-            tensor_dict = {}
-            for key in [
-                'num_detections', 'detection_boxes', 'detection_scores',
-                'detection_classes', 'detection_masks'
-            ]:
-                tensor_name = key + ':0'
-                if tensor_name in all_tensor_names:
-                    tensor_dict[key] = tf.get_default_graph().get_tensor_by_name(tensor_name)
-            if 'detection_masks' in tensor_dict:
-                # The following processing is only for single image
-                detection_boxes = tf.squeeze(tensor_dict['detection_boxes'], [0])
-                detection_masks = tf.squeeze(tensor_dict['detection_masks'], [0])
-                # Reframe is required to translate mask from box coordinates to image coordinates and fit the image size.
-                real_num_detection = tf.cast(tensor_dict['num_detections'][0], tf.int32)
-                detection_boxes = tf.slice(detection_boxes, [0, 0], [real_num_detection, -1])
-                detection_masks = tf.slice(detection_masks, [0, 0, 0], [real_num_detection, -1, -1])
-                detection_masks_reframed = utils_ops.reframe_box_masks_to_image_masks(
-                    detection_masks, detection_boxes, image.shape[1], image.shape[2])
-                detection_masks_reframed = tf.cast(tf.greater(detection_masks_reframed, 0.5), tf.uint8)
-                # Follow the convention by adding back the batch dimension
-                tensor_dict['detection_masks'] = tf.expand_dims(detection_masks_reframed, 0)
-            image_tensor = tf.get_default_graph().get_tensor_by_name('image_tensor:0')
-
-            # Run inference
-            output_dict = sess.run(tensor_dict, feed_dict={image_tensor: image})
-
-            # all outputs are float32 numpy arrays, so convert types as appropriate
-            output_dict['num_detections'] = int(output_dict['num_detections'][0])
-            output_dict['detection_classes'] = output_dict['detection_classes'][0].astype(np.int64)
-            output_dict['detection_boxes'] = output_dict['detection_boxes'][0]
-            output_dict['detection_scores'] = output_dict['detection_scores'][0]
-            if 'detection_masks' in output_dict:
-                output_dict['detection_masks'] = output_dict['detection_masks'][0]
-    return output_dict
-
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
+

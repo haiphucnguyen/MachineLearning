@@ -1,8 +1,8 @@
 <app-header></app-header>
-<app-camera (pictureTaken)="takePicture($event)"></app-camera>
+<!--<app-camera (pictureTaken)="takePicture($event)"></app-camera>
 <img *ngFor="let img of webcamImages" [src]="img.imageAsDataUrl" width="200" class="img-wc">
 <br/>
-<button (click)="uploadFromWebcam()" class="btn-upload">Upload from Webcam</button>
+<button (click)="uploadFromWebcam()" class="btn-upload">Upload from Webcam</button>-->
 
 <form [formGroup]="formGroup" (ngSubmit)="submit()" class="upload-form">
 
@@ -13,15 +13,15 @@
 </form>
 
 <div class="result">
-  <figure>
+  <figure *ngIf="originalImg">
     <img src="{{originalImg}}" alt="Original" width="450"/>
     <figcaption>Original</figcaption>
   </figure>
-  <figure>
+  <figure *ngIf="plotSrc">
     <img src="{{plotSrc}}" alt="Object detected" width="450"/>
     <figcaption>Object detected</figcaption>
   </figure>
-  <figure>
+  <figure *ngIf="plotSrc">
     <img src="{{originalImg}}" alt="Class Activation Map" width="450"/>
     <figcaption>Class Activation Map</figcaption>
   </figure>
