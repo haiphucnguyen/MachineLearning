@@ -13,15 +13,15 @@
 </form>
 
 <div class="result">
-  <figure>
+  <figure *ngIf="originalImg">
     <img src="{{originalImg}}" alt="Original" width="450"/>
     <figcaption>Original</figcaption>
   </figure>
-  <figure>
+  <figure *ngIf="plotSrc">
     <img src="{{plotSrc}}" alt="Object detected" width="450"/>
     <figcaption>Object detected</figcaption>
   </figure>
-  <figure>
+  <figure *ngIf="plotSrc">
     <img src="{{originalImg}}" alt="Class Activation Map" width="450"/>
     <figcaption>Class Activation Map</figcaption>
   </figure>
