@@ -74,7 +74,7 @@ def buildModel():
     # 2: Load the trained weights into the model.
 
     # TODO: Set the path of the trained weights.
-    weights_path = '../../../app/keras-ssd/data/VGG_VOC0712Plus_SSD_300x300_iter_240000.h5'
+    weights_path = './keras-ssd/data/VGG_VOC0712Plus_SSD_300x300_iter_240000.h5'
 
     tmpModel.load_weights(weights_path, by_name=True)
 
