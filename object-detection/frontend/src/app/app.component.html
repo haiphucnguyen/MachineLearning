@@ -8,18 +8,18 @@
 
   <app-file-upload formControlName="image" [progress]="progress"></app-file-upload>
 
-  <button class="btn-upload">Upload Training Images</button>
+  <button class="btn-upload">DETECT OBJECT</button>
 
 </form>
 
 <div class="result">
   <figure *ngIf="originalImg">
     <figcaption>Original</figcaption>
-    <img src="{{originalImg}}" alt="Original" width="450"/>
+    <img src="{{originalImg}}" alt="Original" width="500"/>
   </figure>
   <figure *ngIf="plotSrc">
     <figcaption>Object detected and Class Activation Map</figcaption>
-    <img src="{{plotSrc}}" alt="Object detected" width="900"/>
+    <img src="{{plotSrc}}" alt="Object detected" width="1000"/>
   </figure>
 </div>
 <router-outlet></router-outlet>
