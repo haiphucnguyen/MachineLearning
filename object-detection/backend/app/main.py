@@ -38,6 +38,7 @@ from collections import defaultdict
 from io import StringIO
 from matplotlib import pyplot as plt
 from PIL import Image
+from vis.visualization import visualize_cam
 
 # the all-important app variable:
 app = Flask(__name__)
@@ -130,7 +131,8 @@ def detectObjects(image_name):
                'horse', 'motorbike', 'person', 'pottedplant',
                'sheep', 'sofa', 'train', 'tvmonitor']
 
-    fig = plt.figure(figsize=(20, 12))
+    fig = plt.figure(figsize=(50, 20))#figsize=(20, 12)
+    plt.subplot(1, 2, 1)
     plt.imshow(orig_images[0])
     plt.axis("off")
 
@@ -147,7 +149,19 @@ def detectObjects(image_name):
         current_axis.add_patch(
             plt.Rectangle((xmin, ymin), xmax - xmin, ymax - ymin, color=color, fill=False, linewidth=2))
         current_axis.text(xmin, ymin, label, size='x-large', color='white', bbox={'facecolor': color, 'alpha': 1.0})
+
+    # show heat map
+    # After try with each layer, we choose layer 23 to visualize CAM.
+        heatmap = visualizeCam(model, 23, input_images[0])
+        plt.subplot(1, 2, 2)
+        plt.imshow(heatmap)
+        plt.axis('off')
     return fig
+
+
+def visualizeCam(model,layer, image):
+    heat_map = visualize_cam(model, layer, None, image)
+    return heat_map
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')

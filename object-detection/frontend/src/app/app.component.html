@@ -14,16 +14,12 @@
 
 <div class="result">
   <figure *ngIf="originalImg">
-    <img src="{{originalImg}}" alt="Original" width="450"/>
     <figcaption>Original</figcaption>
+    <img src="{{originalImg}}" alt="Original" width="450"/>
   </figure>
   <figure *ngIf="plotSrc">
-    <img src="{{plotSrc}}" alt="Object detected" width="450"/>
-    <figcaption>Object detected</figcaption>
-  </figure>
-  <figure *ngIf="plotSrc">
-    <img src="{{originalImg}}" alt="Class Activation Map" width="450"/>
-    <figcaption>Class Activation Map</figcaption>
+    <figcaption>Object detected and Class Activation Map</figcaption>
+    <img src="{{plotSrc}}" alt="Object detected" width="900"/>
   </figure>
 </div>
 <router-outlet></router-outlet>

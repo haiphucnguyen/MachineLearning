@@ -8,7 +8,7 @@ RUN sudo apt-get update && apt-get install -y protobuf-compiler python-pil pytho
 
 USER $NB_UID
 
-RUN pip install --user Cython contextlib2 matplotlib Flask opencv-python tqdm lxml mpld3
+RUN pip install --user Cython contextlib2 matplotlib Flask opencv-python tqdm lxml mpld3 keras-vis
 
 RUN pip install --upgrade numpy
 
