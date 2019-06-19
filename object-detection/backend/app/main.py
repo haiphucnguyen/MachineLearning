@@ -39,6 +39,7 @@ from io import StringIO
 from matplotlib import pyplot as plt
 from PIL import Image
 from vis.visualization import visualize_cam
+import cv2
 
 # the all-important app variable:
 app = Flask(__name__)
@@ -131,8 +132,8 @@ def detectObjects(image_name):
                'horse', 'motorbike', 'person', 'pottedplant',
                'sheep', 'sofa', 'train', 'tvmonitor']
 
-    fig = plt.figure(figsize=(30, 20))
-    fig.subplots_adjust(left=0, right=2, top=1, bottom=0, wspace=0, hspace=0)
+    fig = plt.figure(figsize=(40, 20))
+    # fig.subplots_adjust(left=0, right=2, top=1, bottom=0, wspace=0, hspace=0)
     plt.subplot(1, 2, 1)
     plt.imshow(orig_images[0])
     plt.axis("off")
@@ -155,8 +156,8 @@ def detectObjects(image_name):
     # After try with each layer, we choose layer 23 to visualize CAM.
         heatmap = visualizeCam(model, 23, input_images[0])
         plt.subplot(1, 2, 2)
-        # heatmap = np.array(heatmap).reshape((orig_images[0].shape[0], orig_images[0].shape[1]))
-        plt.imshow(heatmap)
+        res = cv2.resize(heatmap, dsize=(orig_images[0].shape[1], orig_images[0].shape[0]), interpolation=cv2.INTER_CUBIC)
+        plt.imshow(res)
         plt.axis('off')
     return fig
 
