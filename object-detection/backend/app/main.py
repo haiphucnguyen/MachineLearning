@@ -44,10 +44,7 @@ import cv2
 # the all-important app variable:
 app = Flask(__name__)
 
-img_height = 300
-img_width = 300
-
-def buildModel():
+def buildModel(img_height, img_width):
     tmpModel = ssd_300(image_size=(img_height, img_width, 3),
                     n_classes=20,
                     mode='inference',
@@ -104,13 +101,15 @@ def uploadFiles():
 
 def detectObjects(image_name):
     K.clear_session()
-    model = buildModel()
+    # We'll only load one image in this example.
+    img_path = os.path.join('upload', image_name)
+    img_height, img_width = 300, 300
+    print("Image size {} {}".format(img_height, img_width))
+    model = buildModel(img_height, img_width)
 
     orig_images = []  # Store the images here.
     input_images = []  # Store resized versions of the images here.
 
-    # We'll only load one image in this example.
-    img_path = os.path.join('upload', image_name)
 
     orig_images.append(imread(img_path))
     img = image.load_img(img_path, target_size=(img_height, img_width))
